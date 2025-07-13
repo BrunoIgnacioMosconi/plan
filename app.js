@@ -15,19 +15,19 @@ function exportarHistorialCSV() {
         dias[fechaSolo].push(item);
     });
     let csv = 'Fecha,Agua,Suplementos,Comida,Selección\n';
-    Object.keys(dias).sort((a,b) => {
+    Object.keys(dias).sort((a, b) => {
         const [da, ma, ya] = a.split('/');
         const [db, mb, yb] = b.split('/');
-        return new Date(`${yb}-${mb}-${db}`) - new Date(`${ya}-${ma}-${da}`);
+        return new Date(`${yb}-${mb}-${da}`) - new Date(`${ya}-${ma}-${da}`);
     }).forEach(fecha => {
         const agua = waterCounts[fecha] || 0;
         const suplementos = (suplementosPorDia[fecha] || []).join(' | ');
         dias[fecha].forEach(item => {
-            const fechaCSV = `"${fecha.replace(/"/g,'""')}"`;
+            const fechaCSV = `"${fecha.replace(/"/g, '""')}"`;
             const aguaCSV = `"${agua}"`;
-            const suplementosCSV = `"${suplementos.replace(/"/g,'""')}"`;
-            const nombre = `"${(item.nombre||'').replace(/"/g,'""')}"`;
-            const seleccion = `"${(item.seleccion||'').replace(/"/g,'""')}"`;
+            const suplementosCSV = `"${suplementos.replace(/"/g, '""')}"`;
+            const nombre = `"${(item.nombre || '').replace(/"/g, '""')}"`;
+            const seleccion = `"${(item.seleccion || '').replace(/"/g, '""')}"`;
             csv += `${fechaCSV},${aguaCSV},${suplementosCSV},${nombre},${seleccion}\n`;
         });
     });
@@ -60,7 +60,7 @@ function importarHistorialCSV(file) {
         const idxSup = headers.findIndex(h => h.toLowerCase().includes('suplementos'));
         const idxComida = headers.findIndex(h => h.toLowerCase().includes('comida'));
         const idxSel = headers.findIndex(h => h.toLowerCase().includes('selección'));
-        if (idxFecha<0 || idxComida<0 || idxSel<0) {
+        if (idxFecha < 0 || idxComida < 0 || idxSel < 0) {
             alert('CSV en formato inesperado.');
             return;
         }
@@ -69,14 +69,14 @@ function importarHistorialCSV(file) {
         const historial = [];
         for (let i = 1; i < lines.length; i++) {
             const cols = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-            const fecha = (cols[idxFecha]||'').replace(/(^"|"$)/g,'').trim();
-            const agua = (cols[idxAgua]||'').replace(/(^"|"$)/g,'').trim();
-            const sup = (cols[idxSup]||'').replace(/(^"|"$)/g,'').trim();
-            const nombre = (cols[idxComida]||'').replace(/(^"|"$)/g,'').trim();
-            const seleccion = (cols[idxSel]||'').replace(/(^"|"$)/g,'').trim();
+            const fecha = (cols[idxFecha] || '').replace(/(^"|"$)/g, '').trim();
+            const agua = (cols[idxAgua] || '').replace(/(^"|"$)/g, '').trim();
+            const sup = (cols[idxSup] || '').replace(/(^"|"$)/g, '').trim();
+            const nombre = (cols[idxComida] || '').replace(/(^"|"$)/g, '').trim();
+            const seleccion = (cols[idxSel] || '').replace(/(^"|"$)/g, '').trim();
             if (fecha) {
-                if (agua) waterCounts[fecha] = parseInt(agua,10) || 0;
-                if (sup) suplementosPorDia[fecha] = sup.split(' | ').map(s=>s.trim());
+                if (agua) waterCounts[fecha] = parseInt(agua, 10) || 0;
+                if (sup) suplementosPorDia[fecha] = sup.split(' | ').map(s => s.trim());
             }
             if (fecha && nombre) {
                 historial.push({ fecha, nombre, seleccion });
@@ -93,26 +93,79 @@ function importarHistorialCSV(file) {
 
 // — Datos y lógica core de la app —
 const opciones = {
-    proteinas: [ "Vaso de leche (250cc)", /*...*/ "Levadura nutricional (1 cda)" ],
-    hidratos:   [ "Pan lactal integral (4u)", /*...*/ "Choclo" ],
-    frutas:     [ "Fruta","Banana","Manzana","Naranja","Pera","Frutilla","Mandarina","Durazno","Ciruela" ],
-    colaciones: [ "Fruta","Gelatina","Torta de avena","Yogur pote x120grs","Barras de cereal","Muttant Mass" ]
+    proteinas: [
+        "Vaso de leche (250cc)",
+        "Vaso de yogur (200cc)",
+        "Porción de queso (70gr)",
+        "Fetas de queso (4u)",
+        "Queso untable (2 cdas)",
+        "Huevo entero (3u)",
+        "Claras",
+        "Queso PortSalut (80gr)",
+        "Lomo/solomillo/peceto/bola de lomo/cuadril/nalga (200gr)",
+        "Abadejo/atún/merluza/salmón/trucha (200gr)",
+        "Pollo/pavo (200gr)",
+        "Ricota (80gr)",
+        "Levadura nutricional (1 cda)"
+    ],
+    hidratos: [
+        "Pan lactal integral (4u)",
+        "Pan de mesa (8u)",
+        "Tostada de arroz (6u)",
+        "Granola (140gr)",
+        "Avena (140gr)",
+        "BabyScuit (2u)",
+        "Legumbres (200gr)",
+        "Pastas (220gr cruda)",
+        "Arroz (220gr cocido)",
+        "Pastas rellenas (300gr)",
+        "Papa mediana (2u)",
+        "Lentejas/soja (200gr)",
+        "Choclo",
+        "Camote"
+    ],
+    frutas: [
+        "Fruta",
+        "Banana",
+        "Manzana",
+        "Naranja",
+        "Pera",
+        "Frutilla",
+        "Mandarina",
+        "Durazno",
+        "Ciruela"
+    ],
+    colaciones: [
+        "Fruta",
+        "Gelatina",
+        "Torta de avena",
+        "Yogur pote x120grs",
+        "Barras de cereal",
+        "Muttant Mass"
+    ]
 };
-const suplementos = [ "Creatina","Proteína","Muttant Mass" ];
+// Aquí separamos "Muttant Mass" en dos scoops distintos:
+const suplementos = [
+    "Creatina",
+    "Proteína",
+    "Muttant Mass (Scoop 1)",
+    "Muttant Mass (Scoop 2)"
+];
 const comidas = [
-    { nombre:"Desayuno", grupos:["proteinas","hidratos","frutas"] },
-    { nombre:"Almuerzo",  grupos:["proteinas","hidratos","frutas"] },
-    { nombre:"Merienda",  grupos:["proteinas","hidratos","frutas"] },
-    { nombre:"Cena",      grupos:["proteinas","hidratos","frutas"] },
-    { nombre:"Colación",  grupos:["colaciones"] }
+    { nombre: "Desayuno", grupos: ["proteinas", "hidratos", "frutas"] },
+    { nombre: "Almuerzo",  grupos: ["proteinas", "hidratos", "frutas"] },
+    { nombre: "Merienda",  grupos: ["proteinas", "hidratos", "frutas"] },
+    { nombre: "Cena",      grupos: ["proteinas", "hidratos", "frutas"] },
+    { nombre: "Colación",  grupos: ["colaciones"] }
 ];
 
 function crearSelector(grupo, idx) {
     const select = document.createElement('select');
     select.id = `select-${grupo}-${idx}`;
-    opciones[grupo].forEach(o=>{
+    opciones[grupo].forEach(o => {
         const opt = document.createElement('option');
-        opt.value=o; opt.textContent=o;
+        opt.value = o;
+        opt.textContent = o;
         select.appendChild(opt);
     });
     return select;
@@ -122,47 +175,50 @@ function cargarSuplementosDia() {
     const div = document.getElementById('suplementos-dia');
     div.innerHTML = '<strong>Suplementos de hoy:</strong>';
     const key = new Date().toLocaleDateString('es-AR');
-    const tomados = JSON.parse(localStorage.getItem('suplementosPorDia')||'{}')[key]||[];
-    suplementos.forEach(sup=>{
+    const tomados = JSON.parse(localStorage.getItem('suplementosPorDia') || '{}')[key] || [];
+    suplementos.forEach(sup => {
         const label = document.createElement('label');
         const cb = document.createElement('input');
-        cb.type='checkbox'; cb.checked=tomados.includes(sup);
-        cb.onchange = ()=>{
-            const m = JSON.parse(localStorage.getItem('suplementosPorDia')||'{}');
-            const arr = m[key]||[];
-            if (cb.checked) arr.push(sup); else {
-                const i = arr.indexOf(sup); if (i>=0) arr.splice(i,1);
+        cb.type = 'checkbox';
+        cb.checked = tomados.includes(sup);
+        cb.onchange = () => {
+            const m = JSON.parse(localStorage.getItem('suplementosPorDia') || '{}');
+            const arr = m[key] || [];
+            if (cb.checked) arr.push(sup);
+            else {
+                const i = arr.indexOf(sup);
+                if (i >= 0) arr.splice(i, 1);
             }
-            m[key]=[...new Set(arr)];
-            localStorage.setItem('suplementosPorDia',JSON.stringify(m));
+            m[key] = [...new Set(arr)];
+            localStorage.setItem('suplementosPorDia', JSON.stringify(m));
             cargarHistorial();
         };
         label.appendChild(cb);
-        label.append(' '+sup);
+        label.append(' ' + sup);
         div.appendChild(label);
     });
 }
 
 function cargarComidas() {
     const ul = document.getElementById('comidas-lista');
-    ul.innerHTML='';
-    const hist = JSON.parse(localStorage.getItem('historialComidas')||'[]');
+    ul.innerHTML = '';
+    const hist = JSON.parse(localStorage.getItem('historialComidas') || '[]');
     const today = new Date().toLocaleDateString('es-AR');
-    comidas.forEach((c,i)=>{
+    comidas.forEach((c, i) => {
         const li = document.createElement('li');
         li.innerHTML = `<strong>${c.nombre}</strong> `;
-        c.grupos.forEach(g=>{
-            li.append(`${g.charAt(0).toUpperCase()+g.slice(1)}: `);
-            li.append(crearSelector(g,i));
+        c.grupos.forEach(g => {
+            li.append(`${g.charAt(0).toUpperCase() + g.slice(1)}: `);
+            li.append(crearSelector(g, i));
         });
         const btn = document.createElement('button');
-        btn.textContent='Marcar';
-        btn.onclick = ()=>marcarComida(i);
-        const done = hist.some(x=>{
+        btn.textContent = 'Marcar';
+        btn.onclick = () => marcarComida(i);
+        const done = hist.some(x => {
             const d = x.fecha.split(',')[0].split(' ')[0].trim();
-            return d===today && x.nombre===c.nombre;
+            return d === today && x.nombre === c.nombre;
         });
-        if (done) btn.disabled=true;
+        if (done) btn.disabled = true;
         li.append(btn);
         ul.append(li);
     });
@@ -171,78 +227,176 @@ function cargarComidas() {
 function marcarComida(i) {
     const fecha = new Date().toLocaleString();
     const c = comidas[i];
-    const sel = c.grupos.map(g=>{
+    const sel = c.grupos.map(g => {
         const s = document.getElementById(`select-${g}-${i}`);
         return `${g}: ${s.value}`;
     }).join(', ');
-    let h = JSON.parse(localStorage.getItem('historialComidas')||'[]');
-    h.push({ nombre:c.nombre, seleccion:sel, fecha });
-    localStorage.setItem('historialComidas',JSON.stringify(h));
+    let h = JSON.parse(localStorage.getItem('historialComidas') || '[]');
+    h.push({ nombre: c.nombre, seleccion: sel, fecha });
+    localStorage.setItem('historialComidas', JSON.stringify(h));
     cargarComidas();
     cargarHistorial();
 }
 
 function cargarHistorial() {
     const ul = document.getElementById('historial-lista');
-    ul.innerHTML='';
-    const h = JSON.parse(localStorage.getItem('historialComidas')||'[]');
+    ul.innerHTML = '';
+    const h = JSON.parse(localStorage.getItem('historialComidas') || '[]');
     const dias = {};
-    h.forEach(x=>{
+    h.forEach(x => {
         const d = x.fecha.split(',')[0].split(' ')[0].trim();
-        (dias[d]||(dias[d]=[])).push(x);
+        (dias[d] || (dias[d] = [])).push(x);
     });
-    Object.keys(dias).sort().forEach(fecha=>{
+    Object.keys(dias).sort().forEach(fecha => {
         const li = document.createElement('li');
-        li.className='historial-fecha';
-        let wc = JSON.parse(localStorage.getItem('waterCounts')||'{}')[fecha]||0;
-        let sup = (JSON.parse(localStorage.getItem('suplementosPorDia')||'{}')[fecha]||[]).join(', ');
-        li.textContent = `${fecha} ▼ | Agua: ${wc}${sup?(' | Sup: '+sup):''}`;
+        li.className = 'historial-fecha';
+        let wc = JSON.parse(localStorage.getItem('waterCounts') || '{}')[fecha] || 0;
+        let sup = (JSON.parse(localStorage.getItem('suplementosPorDia') || '{}')[fecha] || []).join(', ');
+        li.textContent = `${fecha} ▼ | Agua: ${wc}${sup ? ' | Sup: ' + sup : ''}`;
         ul.append(li);
         const inner = document.createElement('ul');
-        dias[fecha].forEach(item=>{
+        dias[fecha].forEach(item => {
             const li2 = document.createElement('li');
             li2.textContent = `${item.nombre} (${item.seleccion})`;
             inner.append(li2);
         });
         ul.append(inner);
-        let open=true;
-        li.onclick = ()=>{
-            open=!open;
-            inner.style.display = open?'':'none';
-            li.textContent = open?`${fecha} ▼ | Agua: ${wc}${sup?(' | Sup: '+sup):''}`:
-                              `${fecha} ▶ | Agua: ${wc}${sup?(' | Sup: '+sup):''}`;
+        let open = true;
+        li.onclick = () => {
+            open = !open;
+            inner.style.display = open ? '' : 'none';
+            li.textContent = open
+                ? `${fecha} ▼ | Agua: ${wc}${sup ? ' | Sup: ' + sup : ''}`
+                : `${fecha} ▶ | Agua: ${wc}${sup ? ' | Sup: ' + sup : ''}`;
         };
     });
 }
 
 // — Agua por día —
-function getTodayKey(){ return new Date().toLocaleDateString('es-AR'); }
-function getWaterCount(key){ return JSON.parse(localStorage.getItem('waterCounts')||'{}')[key]||0; }
-function setWaterCount(key,v){
-    const m=JSON.parse(localStorage.getItem('waterCounts')||'{}');
-    m[key]=v; localStorage.setItem('waterCounts',JSON.stringify(m));
+function getTodayKey() { return new Date().toLocaleDateString('es-AR'); }
+function getWaterCount(key) { return JSON.parse(localStorage.getItem('waterCounts') || '{}')[key] || 0; }
+function setWaterCount(key, v) {
+    const m = JSON.parse(localStorage.getItem('waterCounts') || '{}');
+    m[key] = v;
+    localStorage.setItem('waterCounts', JSON.stringify(m));
 }
 
 // — Inicialización al cargar la página —
-window.addEventListener('DOMContentLoaded',()=>{
+window.addEventListener('DOMContentLoaded', () => {
     // export/import
     document.getElementById('export-csv').onclick = exportarHistorialCSV;
-    document.getElementById('import-csv').onchange = e=>{
-        if(e.target.files[0]) importarHistorialCSV(e.target.files[0]);
+    document.getElementById('import-csv').onchange = e => {
+        if (e.target.files[0]) importarHistorialCSV(e.target.files[0]);
     };
+
     // cargar app
     cargarComidas();
     cargarHistorial();
     cargarSuplementosDia();
+
     // agua
     const key = getTodayKey();
     let cnt = getWaterCount(key);
     const span = document.getElementById('water-count');
     span.textContent = cnt;
-    document.getElementById('add-water').onclick = ()=>{
-        cnt++; span.textContent=cnt; setWaterCount(key,cnt); cargarHistorial();
+    document.getElementById('add-water').onclick = () => {
+        cnt++;
+        span.textContent = cnt;
+        setWaterCount(key, cnt);
+        cargarHistorial();
     };
-    document.getElementById('reset-water').onclick = ()=>{
-        cnt=0; span.textContent=cnt; setWaterCount(key,cnt); cargarHistorial();
+    document.getElementById('reset-water').onclick = () => {
+        cnt = 0;
+        span.textContent = cnt;
+        setWaterCount(key, cnt);
+        cargarHistorial();
     };
+
+    // Tabs
+    function showTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
+        document.getElementById('tab-content-' + tab).style.display = '';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
+    document.getElementById('tab-principal').onclick = () => showTab('principal');
+    document.getElementById('tab-historial').onclick = () => showTab('historial');
+    document.getElementById('tab-opciones').onclick = () => showTab('opciones');
+    showTab('principal');
+
+    // Opciones de dropdowns
+    function getOpciones() {
+        const saved = JSON.parse(localStorage.getItem('opcionesDropdowns') || 'null');
+        if (saved) return saved;
+        return JSON.parse(JSON.stringify(opciones)); // copia profunda
+    }
+    function setOpciones(newOpc) {
+        localStorage.setItem('opcionesDropdowns', JSON.stringify(newOpc));
+    }
+    function renderOpcionesForm() {
+        const cont = document.getElementById('opciones-form');
+        cont.innerHTML = '';
+        const grupos = Object.keys(opciones);
+        const current = getOpciones();
+        grupos.forEach(grupo => {
+            const div = document.createElement('div');
+            div.style.marginBottom = '1.5em';
+            div.innerHTML = `<strong>${grupo.charAt(0).toUpperCase() + grupo.slice(1)}</strong>`;
+            const ul = document.createElement('ul');
+            current[grupo].forEach((opt, idx) => {
+                const li = document.createElement('li');
+                li.textContent = opt;
+                const btnDel = document.createElement('button');
+                btnDel.textContent = 'Eliminar';
+                btnDel.style.marginLeft = '1em';
+                btnDel.onclick = () => {
+                    current[grupo].splice(idx, 1);
+                    setOpciones(current);
+                    renderOpcionesForm();
+                    cargarComidas();
+                };
+                li.appendChild(btnDel);
+                ul.appendChild(li);
+            });
+            div.appendChild(ul);
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.placeholder = `Agregar opción a ${grupo}`;
+            inp.style.marginRight = '0.5em';
+            const btnAdd = document.createElement('button');
+            btnAdd.textContent = 'Agregar';
+            btnAdd.onclick = () => {
+                const val = inp.value.trim();
+                if (val && !current[grupo].includes(val)) {
+                    current[grupo].push(val);
+                    setOpciones(current);
+                    renderOpcionesForm();
+                    cargarComidas();
+                    inp.value = '';
+                }
+            };
+            div.appendChild(inp);
+            div.appendChild(btnAdd);
+            cont.appendChild(div);
+        });
+    }
+    renderOpcionesForm();
+
+    // Sobreescribir opciones globales para reflejar cambios
+    window.getOpciones = getOpciones;
+    window.crearSelector = function(grupo, idx) {
+        const select = document.createElement('select');
+        select.id = `select-${grupo}-${idx}`;
+        getOpciones()[grupo].forEach(o => {
+            const opt = document.createElement('option');
+            opt.value = o;
+            opt.textContent = o;
+            select.appendChild(opt);
+        });
+        return select;
+    };
+
+    // Re-render comidas si cambian las opciones
+    window.cargarComidas = cargarComidas;
+    cargarComidas();
 });

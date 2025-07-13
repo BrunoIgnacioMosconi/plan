@@ -9,8 +9,17 @@
 </head>
 <body>
   <header>Mi Plan de Comidas</header>
+  <nav class="tabs-nav">
+    <button class="tab-btn" data-tab="principal" id="tab-principal">Agua, Suplementos y Comidas</button>
+    <button class="tab-btn" data-tab="historial" id="tab-historial">Historial</button>
+    <button class="tab-btn" data-tab="opciones" id="tab-opciones">Opciones de Dropdowns</button>
+  </nav>
   <main>
-    <section>
+    <section id="tab-content-opciones" class="tab-content" style="display:none">
+      <h2>Opciones de Dropdowns</h2>
+      <div id="opciones-form"></div>
+    </section>
+    <section id="tab-content-principal" class="tab-content">
       <h2>Agua y Suplementos</h2>
       <div>
         <span id="water-count">0</span> vasos
@@ -18,14 +27,10 @@
         <button id="reset-water">🔄 Reiniciar</button>
       </div>
       <div id="suplementos-dia" class="suplemento-checkboxes"></div>
-    </section>
-
-    <section>
-      <h2>Comidas del Día</h2>
+      <h2 style="margin-top:2em">Comidas del Día</h2>
       <ul id="comidas-lista"></ul>
     </section>
-
-    <section>
+    <section id="tab-content-historial" class="tab-content" style="display:none">
       <h2>Historial</h2>
       <button id="export-csv" style="margin-bottom:1em">📤 Exportar historial a CSV</button>
       <input type="file" id="import-csv" accept=".csv" style="margin-bottom:1em" />
