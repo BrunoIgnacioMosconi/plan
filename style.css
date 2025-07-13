@@ -1,3 +1,4 @@
+/* Reset & Global Styles */
 body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
@@ -40,10 +41,10 @@ h2 {
   margin-bottom: 1em;
 }
 
+/* Comidas & Historial Lists */
 #comidas-lista {
   padding: 0;
 }
-
 #comidas-lista li {
   background: #e3f2fd;
   border-left: 6px solid #64b5f6;
@@ -61,7 +62,6 @@ h2 {
   padding: 1em;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
-
 #historial-lista li {
   background: #fff;
   border-radius: 6px;
@@ -86,6 +86,7 @@ h2 {
   letter-spacing: 0.5px;
 }
 
+/* Buttons & Inputs */
 button {
   background: #4caf50;
   color: white;
@@ -97,24 +98,20 @@ button {
   box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1);
   transition: background 0.2s, box-shadow 0.2s;
 }
-
 button:hover:not(:disabled) {
   background-color: #43a047;
 }
-
 button:disabled {
   background: #ccc;
   color: #888;
   cursor: not-allowed;
 }
-
 select {
   padding: 0.5em;
   font-size: 1em;
   border-radius: 4px;
   border: 1px solid #ccc;
 }
-
 label {
   font-weight: 500;
   display: flex;
@@ -122,18 +119,19 @@ label {
   gap: 0.5em;
 }
 
+/* Suplementos & Agua */
 .suplemento-checkboxes {
   margin-top: 0.5em;
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
 }
-
 #water-count {
   font-size: 1.4em;
   font-weight: bold;
 }
 
+/* Footer */
 footer {
   text-align: center;
   padding: 2em;
@@ -141,6 +139,7 @@ footer {
   color: #999;
 }
 
+/* Responsive */
 @media (max-width: 600px) {
   body {
     font-size: 17px;
@@ -167,4 +166,104 @@ footer {
   label {
     font-size: 1em;
   }
+}
+
+/* ---------------------------------------------------------------------
+   New Styles: Tabs Navigation & "Opciones de Dropdowns" Screen
+   --------------------------------------------------------------------- */
+
+/* Tabs Navigation */
+.tabs-nav {
+  display: flex;
+  justify-content: center;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 1em;
+}
+.tab-btn {
+  flex: 1;
+  padding: 0.8em 1em;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  color: #555;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-bottom-color 0.2s;
+}
+.tab-btn:hover {
+  color: #000;
+}
+.tab-btn.active {
+  color: #4caf50;
+  border-bottom-color: #4caf50;
+}
+
+/* Tab Content Margin */
+.tab-content {
+  margin-top: 1em;
+}
+
+/* Opciones de Dropdowns Container */
+#tab-content-opciones #opciones-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5em;
+}
+@media (min-width: 600px) {
+  #tab-content-opciones #opciones-form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+#opciones-form > div {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1em;
+}
+#opciones-form strong {
+  display: block;
+  font-size: 1.2em;
+  margin-bottom: 0.5em;
+  text-transform: capitalize;
+}
+#opciones-form ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1em 0;
+}
+#opciones-form li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3em 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+#opciones-form li:last-child {
+  border-bottom: none;
+}
+/* Delete buttons inside list (Eliminar) */
+#opciones-form li button {
+  background: #f44336;
+  padding: 0.3em 0.8em;
+}
+#opciones-form li button:hover:not(:disabled) {
+  background: #d32f2f;
+}
+/* Add button and input */
+#opciones-form input[type="text"] {
+  width: calc(100% - 90px);
+  padding: 0.4em;
+  margin-right: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+#opciones-form > div > button {
+  background: #4caf50;
+  padding: 0.4em 0.8em;
+  float: right;
+}
+#opciones-form > div > button:hover:not(:disabled) {
+  background: #43a047;
 }
