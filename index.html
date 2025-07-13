@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://apis.google.com https://www.gstatic.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; connect-src *; frame-src 'self' https://accounts.google.com https://apis.google.com;">
+  <title>Plan Nutricional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>Mi Plan de Comidas</header>
+  <main>
+    <section>
+      <h2>Agua y Suplementos</h2>
+      <div>
+        <span id="water-count">0</span> vasos
+        <button id="add-water">💧 Sumar</button>
+        <button id="reset-water">🔄 Reiniciar</button>
+      </div>
+      <div id="suplementos-dia" class="suplemento-checkboxes"></div>
+    </section>
+    <section>
+      <h2>Comidas del Día</h2>
+      <ul id="comidas-lista"></ul>
+    </section>
+    <section>
+      <h2>Historial</h2>
+      <button id="export-csv" style="margin-bottom:1em">📤 Exportar historial a CSV</button>
+      <button id="save-drive" style="margin-bottom:1em">☁️ Guardar en Google Drive</button>
+      <button id="restore-drive" style="margin-bottom:1em">☁️ Restaurar desde Google Drive</button>
+      <input type="file" id="import-csv" accept=".csv" style="margin-bottom:1em" />
+      <ul id="historial-lista"></ul>
+    </section>
+  </main>
+  <footer>
+    Seguimiento personal de alimentación – 2025
+  </footer>
+  <script src="app.js"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+</body>
+</html>
