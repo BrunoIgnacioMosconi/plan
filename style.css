@@ -177,29 +177,39 @@ footer {
 .tabs-nav {
   display: flex;
   justify-content: center;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 1em;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 0.5em;
+  border-radius: 12px 12px 0 0;
+  gap: 0.5em;
 }
+
 .tab-btn {
-  flex: 1;
-  padding: 0.8em 1em;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  background: white;
+  color: #4caf50;
+  border: 1px solid #4caf50;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0.6em 1em;
   font-size: 1em;
   font-weight: 500;
-  color: #555;
-  border-bottom: 3px solid transparent;
-  transition: color 0.2s, border-bottom-color 0.2s;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
-.tab-btn:hover {
-  color: #000;
+
+.tab-btn:hover:not(.active) {
+  background: #e8f5e9;
+  color: #388e3c;
 }
+
 .tab-btn.active {
-  color: #4caf50;
-  border-bottom-color: #4caf50;
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+  font-weight: bold;
+  z-index: 1;
 }
+
 
 .tab-content {
   margin-top: 1em;

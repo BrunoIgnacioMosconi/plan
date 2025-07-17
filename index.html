@@ -17,6 +17,10 @@
   <main>
     <section id="tab-content-opciones" class="tab-content" style="display:none">
       <h2>Opciones de Dropdowns</h2>
+      <div style="margin-bottom: 1em;">
+        <button id="export-csv">📤 Exportar todo a CSV</button>
+        <input type="file" id="import-csv" accept=".csv" />
+      </div>
       <div id="opciones-form"></div>
     </section>
     <section id="tab-content-principal" class="tab-content">
@@ -39,8 +43,6 @@
     </section>
     <section id="tab-content-historial" class="tab-content" style="display:none">
       <h2>Historial</h2>
-      <button id="export-csv" style="margin-bottom:1em">📤 Exportar historial a CSV</button>
-      <input type="file" id="import-csv" accept=".csv" style="margin-bottom:1em" />
       <ul id="historial-lista"></ul>
     </section>
   </main>
