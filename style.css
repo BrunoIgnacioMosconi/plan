@@ -206,25 +206,22 @@ footer {
 }
 
 /* Opciones de Dropdowns Container */
+
 #tab-content-opciones #opciones-form {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5em;
-}
-@media (min-width: 600px) {
-  #tab-content-opciones #opciones-form {
-    grid-template-columns: 1fr 1fr;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
 }
 #opciones-form > div {
   background: #fafafa;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 1em;
+  margin-bottom: 0.5em;
 }
 #opciones-form strong {
   display: block;
-  font-size: 1.2em;
+  font-size: 1.1em;
   margin-bottom: 0.5em;
   text-transform: capitalize;
 }
@@ -243,27 +240,54 @@ footer {
 #opciones-form li:last-child {
   border-bottom: none;
 }
-/* Delete buttons inside list (Eliminar) */
 #opciones-form li button {
   background: #f44336;
   padding: 0.3em 0.8em;
+  font-size: 1em;
+  border-radius: 6px;
 }
 #opciones-form li button:hover:not(:disabled) {
   background: #d32f2f;
 }
-/* Add button and input */
 #opciones-form input[type="text"] {
-  width: calc(100% - 90px);
-  padding: 0.4em;
-  margin-right: 0.5em;
+  width: 100%;
+  padding: 0.7em;
+  margin-bottom: 0.5em;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
 }
 #opciones-form > div > button {
   background: #4caf50;
-  padding: 0.4em 0.8em;
-  float: right;
+  padding: 0.7em 0.8em;
+  width: 100%;
+  margin-top: 0.3em;
+  float: none;
+  font-size: 1em;
+  border-radius: 6px;
 }
 #opciones-form > div > button:hover:not(:disabled) {
   background: #43a047;
+}
+@media (min-width: 600px) {
+  #tab-content-opciones #opciones-form {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1.5em;
+  }
+  #opciones-form > div {
+    width: 48%;
+    min-width: 260px;
+  }
+  #opciones-form input[type="text"] {
+    width: calc(100% - 90px);
+    margin-bottom: 0;
+    margin-right: 0.5em;
+  }
+  #opciones-form > div > button {
+    width: auto;
+    margin-top: 0;
+    float: right;
+  }
 }
