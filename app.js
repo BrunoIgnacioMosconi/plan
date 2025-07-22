@@ -729,6 +729,14 @@ window.addEventListener('DOMContentLoaded', () => {
   renderOpcionesForm();
 });
 
+  document.getElementById('reiniciar-app').onclick = () => {
+    if (confirm('¿Querés reiniciar la app? Se eliminarán todos los datos y se restaurarán las opciones por defecto.')) {
+      localStorage.clear();
+      alert('App reiniciada. Se restauró la configuración original.');
+      location.reload();
+    }
+  };
+
 // — Registrar Service Worker —
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js')
