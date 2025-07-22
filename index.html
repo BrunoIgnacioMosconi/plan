@@ -15,14 +15,11 @@
     <button class="tab-btn" data-tab="principal" id="tab-principal">Agua, Suplementos y Comidas</button>
     <button class="tab-btn" data-tab="historial" id="tab-historial">Historial</button>
     <button class="tab-btn" data-tab="opciones" id="tab-opciones">Opciones de Dropdowns</button>
+    <button class="tab-btn" data-tab="ayuda" id="tab-ayuda">Ayuda</button>
   </nav>
   <main>
     <section id="tab-content-opciones" class="tab-content" style="display:none">
       <h2>Opciones de Dropdowns</h2>
-      <div style="margin-bottom: 1em;">
-        <button id="export-csv">📤 Exportar todo a CSV</button>
-        <input type="file" id="import-csv" accept=".csv" />
-      </div>
       <div id="opciones-form"></div>
     </section>
     <section id="tab-content-principal" class="tab-content">
@@ -47,6 +44,24 @@
       <h2>Historial</h2>
       <ul id="historial-lista"></ul>
     </section>
+    <section id="tab-content-ayuda" class="tab-content" style="display:none">
+      <h2>Ayuda y Exportación</h2>
+      <div style="margin-bottom: 1em;">
+        <button id="export-csv">📤 Exportar todo a CSV</button>
+        <input type="file" id="import-csv" accept=".csv" />
+      </div>
+      <div style="background:#e3f2fd; padding:1em; border-radius:8px;">
+        <h3>📱 Instalación en iOS</h3>
+        <p>Para instalar esta app:</p>
+        <ol>
+          <li>Abrí esta página en Safari.</li>
+          <li>Tocá el botón de “Compartir” (cuadrado con flecha hacia arriba).</li>
+          <li>Elegí “Agregar a pantalla de inicio”.</li>
+        </ol>
+        <p>¡Listo! La app se verá como una aplicación nativa.</p>
+      </div>
+    </section>
+
   </main>
   <footer>
     Seguimiento personal de alimentación – 2025

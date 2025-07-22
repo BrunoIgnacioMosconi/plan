@@ -711,6 +711,8 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('tab-principal').onclick = () => showTab('principal');
   document.getElementById('tab-historial').onclick = () => showTab('historial');
   document.getElementById('tab-opciones').onclick = () => showTab('opciones');
+  document.getElementById('tab-ayuda').onclick = () => showTab('ayuda');
+
   showTab('principal');
 
   renderOpcionesForm();
