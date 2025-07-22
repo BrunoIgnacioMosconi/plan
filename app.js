@@ -4,8 +4,7 @@ function exportarHistorialCSV() {
   const waterCounts = JSON.parse(localStorage.getItem('waterCounts') || '{}');
   const suplementosPorDia = JSON.parse(localStorage.getItem('suplementosPorDia') || '{}');
   if (!historial.length) {
-    alert('No hay historial para exportar.');
-    return;
+    console.warn('No hay historial de comidas, pero se exportarán suplementos, agua y opciones.');
   }
   const dias = {};
   historial.forEach(item => {
