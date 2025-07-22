@@ -256,16 +256,22 @@ const opciones = {
   vegetales_cena: [
     "SI",
     "NO",
-  ]
+  ],
+  suplementos: [
+    "Creatina",
+    "Proteína",
+    "Muttant Mass (Scoop 1)",
+    "Muttant Mass (Scoop 2)"
+  ],
 };
 
 // 💊 Lista de suplementos disponibles para elegir por día
-const suplementos = [
-  "Creatina",
-  "Proteína",
-  "Muttant Mass (Scoop 1)",
-  "Muttant Mass (Scoop 2)"
-];
+// const suplementos = [
+//   "Creatina",
+//   "Proteína",
+//   "Muttant Mass (Scoop 1)",
+//   "Muttant Mass (Scoop 2)"
+// ];
 
 // 🥗 Configuración de comidas para días de ENTRENAMIENTO
 // Cada entrada representa una comida (ej: Desayuno) con los grupos de dropdowns que se van a mostrar
@@ -393,7 +399,7 @@ function cargarSuplementosDia() {
   div.innerHTML = '<strong>💊 Suplementos de hoy:</strong>';
   const key = new Date().toLocaleDateString('es-AR');
   const tomados = JSON.parse(localStorage.getItem('suplementosPorDia') || '{}')[key] || [];
-  suplementos.forEach(sup => {
+  getOpciones().suplementos.forEach(sup => {
     const label = document.createElement('label');
     const cb = document.createElement('input');
     cb.type = 'checkbox';
@@ -668,6 +674,10 @@ div.innerHTML = `<strong data-icon="${icono}">${labelGrupo}</strong>`;
     div.append(inp);
     div.append(btnAdd);
     cont.append(div);
+
+    if (grupoKey === 'suplementos') {
+      cargarSuplementosDia();
+    }
   });
 }
 
