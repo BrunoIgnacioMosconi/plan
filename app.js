@@ -428,12 +428,17 @@ function cargarComidas() {
   comidas.forEach((c, i) => {
     const li = document.createElement('li');
     li.innerHTML = `<strong>${c.nombre}</strong> `;
-
-    // Mostrar cada grupo de dropdowns
+    const done = hist.some(x => {
+      const d = x.fecha.split(',')[0].split(' ')[0].trim();
+      return d === today && x.nombre === c.nombre;
+    });
+        // Mostrar cada grupo de dropdowns
     c.grupos.forEach(g => {
       const labelGrupo = g.replace(/_/g, ' ').toUpperCase();
+      const selector = crearSelector(g, i, c.tipo);
+      if (done) selector.disabled = true; // Desactiva si ya está marcada
       li.append(`${labelGrupo}: `);
-      li.append(crearSelector(g, i, c.tipo));
+      li.append(selector);
     });
 
     // Botón para marcar comida como completada
@@ -441,10 +446,7 @@ function cargarComidas() {
     btn.textContent = 'Marcar';
     btn.onclick = () => marcarComida(i);
 
-    const done = hist.some(x => {
-      const d = x.fecha.split(',')[0].split(' ')[0].trim();
-      return d === today && x.nombre === c.nombre;
-    });
+
     if (done) btn.disabled = true;
     li.append(btn);
     ul.append(li);
