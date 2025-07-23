@@ -197,6 +197,8 @@ function importarHistorialCSV(file) {
         // Actualizar la referencia en memoria
         comidasEntrenamiento.length = 0; // Vaciar el array
         nuevasComidasEntrenamiento.forEach(c => comidasEntrenamiento.push(c));
+
+        console.log('Configuración de entrenamiento actualizada en memoria:', comidasEntrenamiento);
       }
     }
 
@@ -230,6 +232,8 @@ function importarHistorialCSV(file) {
         // Actualizar la referencia en memoria
         comidasNoEntrenamiento.length = 0; // Vaciar el array
         nuevasComidasNoEntrenamiento.forEach(c => comidasNoEntrenamiento.push(c));
+        
+        console.log('Configuración sin entrenamiento actualizada en memoria:', comidasNoEntrenamiento);
       }
     }
 
@@ -237,11 +241,11 @@ function importarHistorialCSV(file) {
     cargarComidas();
     cargarHistorial();
 
-    // Si estamos en la pestaña de opciones, actualizar el formulario de configuración
-    if (tabActual === 'opciones') {
-      renderOpcionesForm();
-    }
+    // Forzar la actualización de la configuración de dropdowns por comida
+    // independientemente de la pestaña actual
+    renderOpcionesForm();
 
+    // Mostrar mensaje de éxito
     mostrarMensaje('Historial, opciones y configuración de comidas importados correctamente', 'success');
   };
   reader.readAsText(file, 'UTF-8');
@@ -810,12 +814,14 @@ function modificarGruposComida(comidaNombre, tipoComida, grupo, accion) {
   // Para añadir un grupo
   if (accion === 'agregar') {
     comida.grupos.push(grupo);
+    console.log(`Grupo ${grupo} agregado a ${comidaNombre}`);
   }
   // Para quitar un grupo
   else if (accion === 'quitar') {
     const index = comida.grupos.indexOf(grupo);
     if (index > -1) {
       comida.grupos.splice(index, 1);
+      console.log(`Grupo ${grupo} eliminado de ${comidaNombre}`);
     }
   }
 
@@ -823,15 +829,22 @@ function modificarGruposComida(comidaNombre, tipoComida, grupo, accion) {
   localStorage.setItem('comidasEntrenamiento', JSON.stringify(comidasEntrenamiento));
   localStorage.setItem('comidasNoEntrenamiento', JSON.stringify(comidasNoEntrenamiento));
 
-  // Actualizar la interfaz
+  // Actualizar todas las interfaces que dependen de esta configuración
   cargarComidas();
   return true;
 }
 
 // — Render opciones de dropdowns (Opciones de Dropdowns) —
 function renderOpcionesForm() {
+  console.log('Renderizando formulario de opciones con configuración actualizada');
   const cont = document.getElementById('opciones-form');
+  if (!cont) {
+    console.warn('Elemento opciones-form no encontrado en el DOM');
+    return; // Salir si no encontramos el contenedor
+  }
   cont.innerHTML = '';
+
+  // Asegurarnos de obtener los datos más recientes
   const current = getOpciones();
 
   // Primero, renderizar la sección para configurar grupos de comidas
@@ -870,6 +883,8 @@ function renderOpcionesForm() {
 
   // Función para mostrar los grupos por tipo de día
   function mostrarConfigComidas(tipoDia) {
+    console.log(`Mostrando configuración para días de ${tipoDia}`);
+    
     // Actualizar botones activos
     document.querySelectorAll('.config-tab').forEach(b => b.classList.remove('active'));
     if (tipoDia === 'entrenamiento') {
@@ -878,7 +893,10 @@ function renderOpcionesForm() {
       btnNoEntrenamiento.classList.add('active');
     }
 
+    // Usar las referencias en memoria actualizadas
     const lista = tipoDia === 'entrenamiento' ? comidasEntrenamiento : comidasNoEntrenamiento;
+    console.log(`Configuración actual de ${tipoDia}:`, lista);
+    
     configComidasDiv.innerHTML = '';
 
     // Listar cada comida con sus grupos
