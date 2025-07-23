@@ -232,7 +232,7 @@ function importarHistorialCSV(file) {
         // Actualizar la referencia en memoria
         comidasNoEntrenamiento.length = 0; // Vaciar el array
         nuevasComidasNoEntrenamiento.forEach(c => comidasNoEntrenamiento.push(c));
-        
+
         console.log('Configuración sin entrenamiento actualizada en memoria:', comidasNoEntrenamiento);
       }
     }
@@ -884,7 +884,7 @@ function renderOpcionesForm() {
   // Función para mostrar los grupos por tipo de día
   function mostrarConfigComidas(tipoDia) {
     console.log(`Mostrando configuración para días de ${tipoDia}`);
-    
+
     // Actualizar botones activos
     document.querySelectorAll('.config-tab').forEach(b => b.classList.remove('active'));
     if (tipoDia === 'entrenamiento') {
@@ -896,7 +896,7 @@ function renderOpcionesForm() {
     // Usar las referencias en memoria actualizadas
     const lista = tipoDia === 'entrenamiento' ? comidasEntrenamiento : comidasNoEntrenamiento;
     console.log(`Configuración actual de ${tipoDia}:`, lista);
-    
+
     configComidasDiv.innerHTML = '';
 
     // Listar cada comida con sus grupos
