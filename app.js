@@ -608,11 +608,177 @@ function setWaterCount(key, v) {
   localStorage.setItem('waterCounts', JSON.stringify(m));
 }
 
+// Función para modificar los grupos de comidas (añadir/quitar dropdowns)
+function modificarGruposComida(comidaNombre, tipoComida, grupo, accion) {
+  const lista = tipoComida === 'entrenamiento' ? comidasEntrenamiento : comidasNoEntrenamiento;
+  const comida = lista.find(c => c.nombre === comidaNombre);
+
+  if (!comida) return false;
+
+  // Para añadir un grupo
+  if (accion === 'agregar') {
+    comida.grupos.push(grupo);
+  }
+  // Para quitar un grupo
+  else if (accion === 'quitar') {
+    const index = comida.grupos.indexOf(grupo);
+    if (index > -1) {
+      comida.grupos.splice(index, 1);
+    }
+  }
+
+  // Guardar los cambios en localStorage
+  localStorage.setItem('comidasEntrenamiento', JSON.stringify(comidasEntrenamiento));
+  localStorage.setItem('comidasNoEntrenamiento', JSON.stringify(comidasNoEntrenamiento));
+
+  // Actualizar la interfaz
+  cargarComidas();
+  return true;
+}
+
 // — Render opciones de dropdowns (Opciones de Dropdowns) —
 function renderOpcionesForm() {
   const cont = document.getElementById('opciones-form');
   cont.innerHTML = '';
   const current = getOpciones();
+
+  // Primero, renderizar la sección para configurar grupos de comidas
+  const configSection = document.createElement('div');
+  configSection.className = 'config-grupos-section';
+  configSection.style.width = '100%';
+  configSection.style.marginBottom = '2em';
+
+  const h3 = document.createElement('h3');
+  h3.textContent = 'Configurar Dropdowns por Comida';
+  configSection.appendChild(h3);
+
+  // Crear pestañas para entrenamiento y no entrenamiento
+  const tabsDiv = document.createElement('div');
+  tabsDiv.className = 'dropdown-config-tabs';
+  tabsDiv.style.marginBottom = '1em';
+
+  const btnEntrenamiento = document.createElement('button');
+  btnEntrenamiento.textContent = 'Día de entrenamiento';
+  btnEntrenamiento.className = 'config-tab active';
+  btnEntrenamiento.onclick = () => mostrarConfigComidas('entrenamiento');
+
+  const btnNoEntrenamiento = document.createElement('button');
+  btnNoEntrenamiento.textContent = 'Día sin entrenamiento';
+  btnNoEntrenamiento.className = 'config-tab';
+  btnNoEntrenamiento.onclick = () => mostrarConfigComidas('no_entrenamiento');
+
+  tabsDiv.appendChild(btnEntrenamiento);
+  tabsDiv.appendChild(btnNoEntrenamiento);
+  configSection.appendChild(tabsDiv);
+
+  // Contenedor para la configuración
+  const configComidasDiv = document.createElement('div');
+  configComidasDiv.id = 'dropdown-config-contenido';
+  configSection.appendChild(configComidasDiv);
+
+  // Función para mostrar los grupos por tipo de día
+  function mostrarConfigComidas(tipoDia) {
+    // Actualizar botones activos
+    document.querySelectorAll('.config-tab').forEach(b => b.classList.remove('active'));
+    if (tipoDia === 'entrenamiento') {
+      btnEntrenamiento.classList.add('active');
+    } else {
+      btnNoEntrenamiento.classList.add('active');
+    }
+
+    const lista = tipoDia === 'entrenamiento' ? comidasEntrenamiento : comidasNoEntrenamiento;
+    configComidasDiv.innerHTML = '';
+
+    // Listar cada comida con sus grupos
+    lista.forEach(comida => {
+      const comidaDiv = document.createElement('div');
+      comidaDiv.className = 'comida-grupos';
+      comidaDiv.style.marginBottom = '1em';
+      comidaDiv.style.padding = '1em';
+      comidaDiv.style.border = '1px solid #e0e0e0';
+      comidaDiv.style.borderRadius = '8px';
+
+      const h4 = document.createElement('h4');
+      h4.textContent = comida.nombre;
+      h4.style.marginTop = '0';
+      comidaDiv.appendChild(h4);
+
+      // Listar los grupos actuales
+      const gruposUl = document.createElement('ul');
+      gruposUl.style.listStyleType = 'none';
+      gruposUl.style.padding = '0';
+
+      comida.grupos.forEach(grupo => {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.alignItems = 'center';
+        li.style.marginBottom = '0.5em';
+
+        const grupoLabel = document.createElement('span');
+        grupoLabel.textContent = grupo.replace(/_/g, ' ').toUpperCase();
+        grupoLabel.style.flex = '1';
+        li.appendChild(grupoLabel);
+
+        const btnQuitar = document.createElement('button');
+        btnQuitar.textContent = '➖ Quitar';
+        btnQuitar.onclick = () => {
+          if (modificarGruposComida(comida.nombre, tipoDia, grupo, 'quitar')) {
+            mostrarConfigComidas(tipoDia);
+          }
+        };
+        li.appendChild(btnQuitar);
+        gruposUl.appendChild(li);
+      });
+
+      comidaDiv.appendChild(gruposUl);
+
+      // Selector para añadir grupos
+      const addGroupDiv = document.createElement('div');
+      addGroupDiv.style.marginTop = '1em';
+      addGroupDiv.style.display = 'flex';
+      addGroupDiv.style.alignItems = 'center';
+
+      const select = document.createElement('select');
+      select.id = `select-add-grupo-${comida.nombre}-${tipoDia}`;
+      select.style.flex = '1';
+      select.style.marginRight = '0.5em';
+
+      // Opciones disponibles para añadir
+      const opcionesGrupo = [
+        'proteinas', 'hidratos', 'frutas', 'grasas', 'vegetales', 'colaciones',
+        'proteinas_dm', 'hidratos_dm', 'frutas_no_entrenamiento', 'proteinas_dm_no_entrenamiento'
+      ];
+
+      opcionesGrupo.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt.replace(/_/g, ' ').toUpperCase();
+        select.appendChild(option);
+      });
+
+      const btnAdd = document.createElement('button');
+      btnAdd.textContent = '➕ Agregar';
+      btnAdd.onclick = () => {
+        const grupoSeleccionado = select.value;
+        if (modificarGruposComida(comida.nombre, tipoDia, grupoSeleccionado, 'agregar')) {
+          mostrarConfigComidas(tipoDia);
+        }
+      };
+
+      addGroupDiv.appendChild(select);
+      addGroupDiv.appendChild(btnAdd);
+      comidaDiv.appendChild(addGroupDiv);
+
+      configComidasDiv.appendChild(comidaDiv);
+    });
+  }
+
+  // Mostrar configuración para día de entrenamiento por defecto
+  mostrarConfigComidas('entrenamiento');
+
+  cont.appendChild(configSection);
+
+  // Continuar con la renderización original de opciones de dropdowns
   Object.keys(opciones).forEach(grupoKey => {
     const div = document.createElement('div');
     div.style.marginBottom = '1.5em';
@@ -687,6 +853,32 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('import-csv').onchange = e => {
     if (e.target.files[0]) importarHistorialCSV(e.target.files[0]);
   };
+
+  // Cargar configuraciones de comidas desde localStorage si existen
+  const entrenamientoSaved = localStorage.getItem('comidasEntrenamiento');
+  const noEntrenamientoSaved = localStorage.getItem('comidasNoEntrenamiento');
+
+  if (entrenamientoSaved) {
+    try {
+      const parsed = JSON.parse(entrenamientoSaved);
+      if (Array.isArray(parsed) && parsed.length) {
+        Object.assign(comidasEntrenamiento, parsed);
+      }
+    } catch (e) {
+      console.error('Error al cargar comidasEntrenamiento:', e);
+    }
+  }
+
+  if (noEntrenamientoSaved) {
+    try {
+      const parsed = JSON.parse(noEntrenamientoSaved);
+      if (Array.isArray(parsed) && parsed.length) {
+        Object.assign(comidasNoEntrenamiento, parsed);
+      }
+    } catch (e) {
+      console.error('Error al cargar comidasNoEntrenamiento:', e);
+    }
+  }
 
   cargarComidas();
   // Cambiar comidas al cambiar tipo de día
