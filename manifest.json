@@ -1,7 +1,7 @@
 {
   "name": "Plan Nutricional",
   "short_name": "MiPlan",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f0f4f8",
   "theme_color": "#4caf50",

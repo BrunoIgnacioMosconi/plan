@@ -549,7 +549,7 @@ function cargarSuplementosDia() {
   div.innerHTML = '<strong>💊 Suplementos de hoy:</strong>';
   const key = new Date().toLocaleDateString('es-AR');
   const tomados = JSON.parse(localStorage.getItem('suplementosPorDia') || '{}')[key] || [];
-  
+
   // Crear un contenedor con mejor diseño para los checkboxes
   const checkboxContainer = document.createElement('div');
   checkboxContainer.className = 'suplementos-checkboxes';
@@ -557,7 +557,7 @@ function cargarSuplementosDia() {
   checkboxContainer.style.flexWrap = 'wrap';
   checkboxContainer.style.gap = '10px';
   checkboxContainer.style.marginTop = '10px';
-  
+
   getOpciones().suplementos.forEach(sup => {
     const label = document.createElement('label');
     label.style.display = 'flex';
@@ -567,7 +567,7 @@ function cargarSuplementosDia() {
     label.style.borderRadius = '5px';
     label.style.cursor = 'pointer';
     label.style.transition = 'background-color 0.3s';
-    
+
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.checked = tomados.includes(sup);
@@ -587,12 +587,12 @@ function cargarSuplementosDia() {
       localStorage.setItem('suplementosPorDia', JSON.stringify(m));
       cargarHistorial();
     };
-    
+
     label.appendChild(cb);
     label.append(' ' + sup);
     checkboxContainer.appendChild(label);
   });
-  
+
   div.appendChild(checkboxContainer);
 }
 
@@ -607,26 +607,26 @@ function cargarComidas() {
 
   comidas.forEach((c, i) => {
     const li = document.createElement('li');
-    
+
     // Agregar encabezado de la comida con estado
     const comidaHeader = document.createElement('div');
     comidaHeader.style.display = 'flex';
     comidaHeader.style.justifyContent = 'space-between';
     comidaHeader.style.alignItems = 'center';
     comidaHeader.style.marginBottom = '12px';
-    
+
     const titulo = document.createElement('div');
     titulo.className = 'comida-titulo';
     titulo.textContent = c.nombre;
-    
+
     const done = hist.some(x => {
       const d = x.fecha.split(',')[0].split(' ')[0].trim();
       return d === today && x.nombre === c.nombre;
     });
-    
+
     comidaHeader.appendChild(titulo);
     li.appendChild(comidaHeader);
-    
+
     // Iconos para los grupos de alimentos
     const iconos = {
       proteinas: "🥩",
@@ -636,25 +636,25 @@ function cargarComidas() {
       grasas: "🥑",
       vegetales: "🥦"
     };
-    
+
     // Mostrar cada grupo de dropdowns
     c.grupos.forEach(g => {
       const grupoDiv = document.createElement('div');
       grupoDiv.className = 'grupo-dropdown';
-      
+
       const labelGrupo = g.replace(/_/g, ' ').toUpperCase();
       const base = g.split('_')[0]; // Para agarrar 'proteinas' de 'proteinas_dm'
       const icono = iconos[base] || '';
-      
+
       const label = document.createElement('label');
       label.innerHTML = `${icono} ${labelGrupo}`;
-      
+
       const selector = crearSelector(g, i, c.tipo);
       if (done) {
         selector.disabled = true; // Desactiva si ya está marcada
         selector.style.opacity = '0.7';
       }
-      
+
       grupoDiv.appendChild(label);
       grupoDiv.appendChild(selector);
       li.appendChild(grupoDiv);
@@ -664,13 +664,13 @@ function cargarComidas() {
     const btnContainer = document.createElement('div');
     btnContainer.style.marginTop = '15px';
     btnContainer.style.textAlign = 'right';
-    
+
     const btn = document.createElement('button');
     if (done) {
       btn.textContent = '✓ Completada';
       btn.className = 'btn-secondary';
       btn.disabled = true;
-      
+
       // Agregar badge de completado
       const badge = document.createElement('span');
       badge.textContent = '✓ Completada';
@@ -687,10 +687,10 @@ function cargarComidas() {
       btn.textContent = 'Marcar como completada';
       btn.onclick = () => marcarComida(i);
     }
-    
+
     btnContainer.appendChild(btn);
     li.appendChild(btnContainer);
-    
+
     // Si está completada, agregar clase para estilo visual
     if (done) {
       li.classList.add('comida-completada');
@@ -698,7 +698,7 @@ function cargarComidas() {
     } else {
       li.style.borderLeft = '5px solid #FFC107';
     }
-    
+
     ul.appendChild(li);
   });
 }
@@ -789,14 +789,14 @@ function cargarHistorial() {
   ul.innerHTML = '';
   const h = JSON.parse(localStorage.getItem('historialComidas') || '[]');
   const dias = {};
-  
+
   // Agrupar por fecha
   h.forEach((item, idx) => {
     const d = item.fecha.split(',')[0].split(' ')[0].trim();
     if (!dias[d]) dias[d] = [];
     dias[d].push({ item, idx });
   });
-  
+
   // Ordenar fechas de más reciente a más antigua
   Object.keys(dias).sort((a, b) => {
     // Convertir dd/mm/yyyy a objetos Date para comparar
@@ -806,25 +806,25 @@ function cargarHistorial() {
   }).forEach(fecha => {
     const li = document.createElement('li');
     li.className = 'historial-fecha';
-    
+
     // Obtener datos de agua y suplementos
     const wc = JSON.parse(localStorage.getItem('waterCounts') || '{}')[fecha] || 0;
     const sup = (JSON.parse(localStorage.getItem('suplementosPorDia') || '{}')[fecha] || []);
-    
+
     // Crear cabecera del día con iconos
     const dateHeader = document.createElement('div');
     dateHeader.style.display = 'flex';
     dateHeader.style.alignItems = 'center';
-    
+
     const dateText = document.createElement('span');
     dateText.innerHTML = `<strong>${fecha}</strong> <span class="toggle-icon">▼</span>`;
     dateText.style.flex = '1';
-    
+
     const badgesContainer = document.createElement('div');
     badgesContainer.style.display = 'flex';
     badgesContainer.style.gap = '10px';
     badgesContainer.style.alignItems = 'center';
-    
+
     // Badge de agua
     const waterBadge = document.createElement('span');
     waterBadge.innerHTML = `💧 ${wc}`;
@@ -834,7 +834,7 @@ function cargarHistorial() {
     waterBadge.style.borderRadius = '12px';
     waterBadge.style.fontSize = '0.85rem';
     badgesContainer.appendChild(waterBadge);
-    
+
     // Badges de suplementos (si hay)
     if (sup.length > 0) {
       const supBadge = document.createElement('span');
@@ -847,48 +847,48 @@ function cargarHistorial() {
       supBadge.style.fontSize = '0.85rem';
       badgesContainer.appendChild(supBadge);
     }
-    
+
     dateHeader.appendChild(dateText);
     dateHeader.appendChild(badgesContainer);
     li.appendChild(dateHeader);
-    
+
     ul.appendChild(li);
-    
+
     // Lista de comidas del día
     const inner = document.createElement('ul');
     inner.style.margin = '0';
     inner.style.padding = '0';
-    
+
     dias[fecha].forEach(({ item, idx }) => {
       const li2 = document.createElement('li');
-      
+
       // Crear estructura para la comida en el historial
       const comidaContainer = document.createElement('div');
       comidaContainer.style.padding = '15px';
-      
+
       // Cabecera con el nombre de la comida y botón de editar
       const comidaHeader = document.createElement('div');
       comidaHeader.style.display = 'flex';
       comidaHeader.style.justifyContent = 'space-between';
       comidaHeader.style.alignItems = 'center';
       comidaHeader.style.marginBottom = '8px';
-      
+
       const nombreComida = document.createElement('span');
       nombreComida.className = 'historial-item-nombre';
       nombreComida.textContent = item.nombre;
-      
+
       const btnEdit = document.createElement('button');
       btnEdit.innerHTML = '✏️ Editar';
       btnEdit.onclick = () => editarHistorial(idx, li2);
-      
+
       comidaHeader.appendChild(nombreComida);
       comidaHeader.appendChild(btnEdit);
       comidaContainer.appendChild(comidaHeader);
-      
+
       // Detalles de la selección con iconos
       const spanSel = document.createElement('div');
       spanSel.className = 'historial-item-seleccion';
-      
+
       const iconos = {
         proteinas: "🥩",
         hidratos: "🍞",
@@ -897,50 +897,50 @@ function cargarHistorial() {
         grasas: "🥑",
         vegetales: "🥦"
       };
-      
+
       const detallesContainer = document.createElement('div');
       detallesContainer.style.display = 'flex';
       detallesContainer.style.flexDirection = 'column';
       detallesContainer.style.gap = '5px';
-      
+
       const partes = item.seleccion.split(', ').map(pair => {
         const [grupo, valor] = pair.split(': ');
         const g = grupo.replace(/_/g, ' ').toUpperCase();
         const base = grupo.split('_')[0]; // para proteinas_dm => proteinas
         const icono = iconos[base] || '';
-        
+
         const detalleFila = document.createElement('div');
         detalleFila.style.display = 'flex';
         detalleFila.style.alignItems = 'center';
-        
+
         const labelGrupo = document.createElement('span');
         labelGrupo.innerHTML = `${icono} ${g}`;
         labelGrupo.style.width = '180px';
         labelGrupo.style.fontWeight = '500';
-        
+
         const valorSpan = document.createElement('span');
         valorSpan.textContent = valor;
         valorSpan.style.color = '#555';
-        
+
         detalleFila.appendChild(labelGrupo);
         detalleFila.appendChild(valorSpan);
         return detalleFila;
       });
-      
+
       partes.forEach(detalle => detallesContainer.appendChild(detalle));
       spanSel.appendChild(detallesContainer);
       comidaContainer.appendChild(spanSel);
-      
+
       li2.appendChild(comidaContainer);
       inner.appendChild(li2);
     });
-    
+
     ul.appendChild(inner);
-    
+
     // Manejo de expansión/colapso
     let open = true;
     const toggleIcon = li.querySelector('.toggle-icon');
-    
+
     li.onclick = (e) => {
       open = !open;
       inner.style.display = open ? '' : 'none';
@@ -972,7 +972,7 @@ function mostrarMensaje(mensaje, tipo = 'info') {
   // Crear el mensaje
   const msgElement = document.createElement('div');
   msgElement.className = `mensaje ${tipo}`;
-  
+
   // Agregar icono según el tipo
   let icono = '';
   if (tipo === 'success') {
@@ -982,9 +982,9 @@ function mostrarMensaje(mensaje, tipo = 'info') {
   } else {
     icono = 'ℹ️';
   }
-  
+
   msgElement.innerHTML = `<div class="mensaje-contenido"><span class="mensaje-icono">${icono}</span> ${mensaje}</div>`;
-  
+
   // Agregar botón de cerrar
   const closeBtn = document.createElement('button');
   closeBtn.innerHTML = '&times;';
@@ -1107,7 +1107,7 @@ function renderOpcionesForm() {
     lista.forEach(comida => {
       const comidaDiv = document.createElement('div');
       comidaDiv.className = 'comida-grupos';
-      
+
       // Encabezado de la comida con estilo mejorado
       const comidaHeader = document.createElement('div');
       comidaHeader.style.display = 'flex';
@@ -1121,13 +1121,13 @@ function renderOpcionesForm() {
       h4.textContent = comida.nombre;
       h4.style.margin = '0';
       h4.style.color = '#388E3C';
-      
+
       // Contador de grupos
       const grupoCount = document.createElement('span');
       grupoCount.textContent = `${comida.grupos.length} grupo(s)`;
       grupoCount.style.fontSize = '0.85rem';
       grupoCount.style.color = '#757575';
-      
+
       comidaHeader.appendChild(h4);
       comidaHeader.appendChild(grupoCount);
       comidaDiv.appendChild(comidaHeader);
@@ -1147,7 +1147,7 @@ function renderOpcionesForm() {
           grupoItem.style.backgroundColor = '#f5f5f5';
           grupoItem.style.borderRadius = '4px';
           grupoItem.style.borderLeft = '3px solid #4CAF50';
-          
+
           // Iconos para cada tipo de grupo
           const iconos = {
             proteinas: "🥩",
@@ -1159,10 +1159,10 @@ function renderOpcionesForm() {
           };
           const base = grupo.split('_')[0];
           const icono = iconos[base] || '';
-          
+
           const grupoLabel = document.createElement('div');
           grupoLabel.innerHTML = `<span class="grupo-icono">${icono}</span> ${grupo.replace(/_/g, ' ').toUpperCase()}`;
-          
+
           const btnQuitar = document.createElement('button');
           btnQuitar.className = 'btn-delete';
           btnQuitar.innerHTML = '✖';
@@ -1180,12 +1180,12 @@ function renderOpcionesForm() {
               mostrarConfigComidas(tipoDia);
             }
           };
-          
+
           grupoItem.appendChild(grupoLabel);
           grupoItem.appendChild(btnQuitar);
           gruposContainer.appendChild(grupoItem);
         });
-        
+
         comidaDiv.appendChild(gruposContainer);
       } else {
         // Mostrar mensaje si no hay grupos
@@ -1215,7 +1215,7 @@ function renderOpcionesForm() {
         'proteinas', 'hidratos', 'frutas', 'grasas', 'vegetales', 'colaciones',
         'proteinas_dm', 'hidratos_dm', 'frutas_no_entrenamiento', 'proteinas_dm_no_entrenamiento'
       ];
-      
+
       const iconos = {
         proteinas: "🥩",
         hidratos: "🍞",
@@ -1228,11 +1228,11 @@ function renderOpcionesForm() {
       opcionesGrupo.forEach(opt => {
         const option = document.createElement('option');
         option.value = opt;
-        
+
         const base = opt.split('_')[0];
         const icono = iconos[base] || '';
         option.textContent = `${icono} ${opt.replace(/_/g, ' ').toUpperCase()}`;
-        
+
         select.appendChild(option);
       });
 
@@ -1281,10 +1281,10 @@ function renderOpcionesForm() {
   Object.keys(opciones).forEach(grupoKey => {
     const div = document.createElement('div');
     div.className = 'grupo-opciones';
-    
+
     // Mostrar el nombre del grupo sin guiones bajos y en mayúsculas
     const labelGrupo = grupoKey.replace(/_/g, ' ').toUpperCase();
-    
+
     // Agregar icono al grupo
     const iconos = {
       proteinas: "🥩",
@@ -1297,7 +1297,7 @@ function renderOpcionesForm() {
     };
     const base = grupoKey.split('_')[0]; // Para agarrar 'proteinas' de 'proteinas_dm'
     const icono = iconos[base] || '';
-    
+
     div.innerHTML = `<strong><span class="grupo-icono">${icono}</span> ${labelGrupo}</strong>`;
 
     // Lista de opciones actuales
@@ -1313,10 +1313,10 @@ function renderOpcionesForm() {
       } else {
         current[grupoKey].forEach((opt, idx) => {
           const li = document.createElement('li');
-          
+
           const optionText = document.createElement('span');
           optionText.textContent = opt;
-          
+
           const btnDel = document.createElement('button');
           btnDel.innerHTML = '✖';
           btnDel.className = 'btn-delete';
@@ -1325,7 +1325,7 @@ function renderOpcionesForm() {
           btnDel.style.height = '30px';
           btnDel.style.padding = '0';
           btnDel.title = 'Eliminar este alimento';
-          
+
           btnDel.onclick = () => {
             current[grupoKey].splice(idx, 1);
             setOpciones(current);
@@ -1333,7 +1333,7 @@ function renderOpcionesForm() {
             renderOpcionesForm();
             cargarComidas();
           };
-          
+
           li.appendChild(optionText);
           li.appendChild(btnDel);
           ul.appendChild(li);
@@ -1341,25 +1341,25 @@ function renderOpcionesForm() {
       }
     }
     div.appendChild(ul);
-    
+
     // Formulario para agregar nuevas opciones
     const addForm = document.createElement('div');
     addForm.style.display = 'flex';
     addForm.style.marginTop = '15px';
-    
+
     const inp = document.createElement('input');
     inp.type = 'text';
     inp.placeholder = `Nuevo alimento...`;
     inp.style.flex = '1';
-    
+
     const btnAdd = document.createElement('button');
     btnAdd.textContent = 'Agregar';
     btnAdd.style.marginLeft = '10px';
-    
+
     btnAdd.onclick = () => {
       const val = inp.value.trim();
       if (!Array.isArray(current[grupoKey])) current[grupoKey] = [];
-      
+
       if (val && !current[grupoKey].includes(val)) {
         current[grupoKey].push(val);
         setOpciones(current);
@@ -1371,18 +1371,18 @@ function renderOpcionesForm() {
         mostrarMensaje(`La opción "${val}" ya existe en ${labelGrupo}`, 'error');
       }
     };
-    
+
     // También permitir agregar con Enter
     inp.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         btnAdd.click();
       }
     });
-    
+
     addForm.appendChild(inp);
     addForm.appendChild(btnAdd);
     div.appendChild(addForm);
-    
+
     opcionesGrid.appendChild(div);
   });
 }
@@ -1451,7 +1451,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // — Registrar Service Worker —
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
+  // Usar una ruta relativa para que funcione en GitHub Pages
+  const swPath = new URL('service-worker.js', window.location.href).pathname;
+  navigator.serviceWorker.register(swPath)
     .then(reg => console.log('SW registrado', reg))
     .catch(err => console.error('SW fallo', err));
 }
