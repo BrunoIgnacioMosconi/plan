@@ -549,27 +549,51 @@ function cargarSuplementosDia() {
   div.innerHTML = '<strong>💊 Suplementos de hoy:</strong>';
   const key = new Date().toLocaleDateString('es-AR');
   const tomados = JSON.parse(localStorage.getItem('suplementosPorDia') || '{}')[key] || [];
+  
+  // Crear un contenedor con mejor diseño para los checkboxes
+  const checkboxContainer = document.createElement('div');
+  checkboxContainer.className = 'suplementos-checkboxes';
+  checkboxContainer.style.display = 'flex';
+  checkboxContainer.style.flexWrap = 'wrap';
+  checkboxContainer.style.gap = '10px';
+  checkboxContainer.style.marginTop = '10px';
+  
   getOpciones().suplementos.forEach(sup => {
     const label = document.createElement('label');
+    label.style.display = 'flex';
+    label.style.alignItems = 'center';
+    label.style.padding = '8px 12px';
+    label.style.backgroundColor = tomados.includes(sup) ? '#4CAF5033' : '#f9f9f9';
+    label.style.borderRadius = '5px';
+    label.style.cursor = 'pointer';
+    label.style.transition = 'background-color 0.3s';
+    
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.checked = tomados.includes(sup);
+    cb.style.marginRight = '8px';
     cb.onchange = () => {
       const m = JSON.parse(localStorage.getItem('suplementosPorDia') || '{}');
       const arr = m[key] || [];
-      if (cb.checked) arr.push(sup);
-      else {
+      if (cb.checked) {
+        arr.push(sup);
+        label.style.backgroundColor = '#4CAF5033';
+      } else {
         const i = arr.indexOf(sup);
         if (i >= 0) arr.splice(i, 1);
+        label.style.backgroundColor = '#f9f9f9';
       }
       m[key] = [...new Set(arr)];
       localStorage.setItem('suplementosPorDia', JSON.stringify(m));
       cargarHistorial();
     };
+    
     label.appendChild(cb);
     label.append(' ' + sup);
-    div.appendChild(label);
+    checkboxContainer.appendChild(label);
   });
+  
+  div.appendChild(checkboxContainer);
 }
 
 // 🧾 Cargar la lista de comidas del día actual (basado en tipo de día)
@@ -583,29 +607,99 @@ function cargarComidas() {
 
   comidas.forEach((c, i) => {
     const li = document.createElement('li');
-    li.innerHTML = `<strong>${c.nombre}</strong> `;
+    
+    // Agregar encabezado de la comida con estado
+    const comidaHeader = document.createElement('div');
+    comidaHeader.style.display = 'flex';
+    comidaHeader.style.justifyContent = 'space-between';
+    comidaHeader.style.alignItems = 'center';
+    comidaHeader.style.marginBottom = '12px';
+    
+    const titulo = document.createElement('div');
+    titulo.className = 'comida-titulo';
+    titulo.textContent = c.nombre;
+    
     const done = hist.some(x => {
       const d = x.fecha.split(',')[0].split(' ')[0].trim();
       return d === today && x.nombre === c.nombre;
     });
-        // Mostrar cada grupo de dropdowns
+    
+    comidaHeader.appendChild(titulo);
+    li.appendChild(comidaHeader);
+    
+    // Iconos para los grupos de alimentos
+    const iconos = {
+      proteinas: "🥩",
+      hidratos: "🍞",
+      frutas: "🍎",
+      colaciones: "🧁",
+      grasas: "🥑",
+      vegetales: "🥦"
+    };
+    
+    // Mostrar cada grupo de dropdowns
     c.grupos.forEach(g => {
+      const grupoDiv = document.createElement('div');
+      grupoDiv.className = 'grupo-dropdown';
+      
       const labelGrupo = g.replace(/_/g, ' ').toUpperCase();
+      const base = g.split('_')[0]; // Para agarrar 'proteinas' de 'proteinas_dm'
+      const icono = iconos[base] || '';
+      
+      const label = document.createElement('label');
+      label.innerHTML = `${icono} ${labelGrupo}`;
+      
       const selector = crearSelector(g, i, c.tipo);
-      if (done) selector.disabled = true; // Desactiva si ya está marcada
-      li.append(`${labelGrupo}: `);
-      li.append(selector);
+      if (done) {
+        selector.disabled = true; // Desactiva si ya está marcada
+        selector.style.opacity = '0.7';
+      }
+      
+      grupoDiv.appendChild(label);
+      grupoDiv.appendChild(selector);
+      li.appendChild(grupoDiv);
     });
 
     // Botón para marcar comida como completada
+    const btnContainer = document.createElement('div');
+    btnContainer.style.marginTop = '15px';
+    btnContainer.style.textAlign = 'right';
+    
     const btn = document.createElement('button');
-    btn.textContent = 'Marcar';
-    btn.onclick = () => marcarComida(i);
-
-
-    if (done) btn.disabled = true;
-    li.append(btn);
-    ul.append(li);
+    if (done) {
+      btn.textContent = '✓ Completada';
+      btn.className = 'btn-secondary';
+      btn.disabled = true;
+      
+      // Agregar badge de completado
+      const badge = document.createElement('span');
+      badge.textContent = '✓ Completada';
+      badge.style.position = 'absolute';
+      badge.style.top = '10px';
+      badge.style.right = '10px';
+      badge.style.backgroundColor = '#4CAF50';
+      badge.style.color = 'white';
+      badge.style.padding = '3px 8px';
+      badge.style.borderRadius = '12px';
+      badge.style.fontSize = '0.8rem';
+      comidaHeader.appendChild(badge);
+    } else {
+      btn.textContent = 'Marcar como completada';
+      btn.onclick = () => marcarComida(i);
+    }
+    
+    btnContainer.appendChild(btn);
+    li.appendChild(btnContainer);
+    
+    // Si está completada, agregar clase para estilo visual
+    if (done) {
+      li.classList.add('comida-completada');
+      li.style.borderLeft = '5px solid #4CAF50';
+    } else {
+      li.style.borderLeft = '5px solid #FFC107';
+    }
+    
+    ul.appendChild(li);
   });
 }
 
@@ -695,56 +789,162 @@ function cargarHistorial() {
   ul.innerHTML = '';
   const h = JSON.parse(localStorage.getItem('historialComidas') || '[]');
   const dias = {};
+  
+  // Agrupar por fecha
   h.forEach((item, idx) => {
     const d = item.fecha.split(',')[0].split(' ')[0].trim();
     if (!dias[d]) dias[d] = [];
     dias[d].push({ item, idx });
   });
-  Object.keys(dias).sort().forEach(fecha => {
+  
+  // Ordenar fechas de más reciente a más antigua
+  Object.keys(dias).sort((a, b) => {
+    // Convertir dd/mm/yyyy a objetos Date para comparar
+    const [dA, mA, yA] = a.split('/');
+    const [dB, mB, yB] = b.split('/');
+    return new Date(yB, mB-1, dB) - new Date(yA, mA-1, dA);
+  }).forEach(fecha => {
     const li = document.createElement('li');
     li.className = 'historial-fecha';
+    
+    // Obtener datos de agua y suplementos
     const wc = JSON.parse(localStorage.getItem('waterCounts') || '{}')[fecha] || 0;
-    const sup = (JSON.parse(localStorage.getItem('suplementosPorDia') || '{}')[fecha] || []).join(', ');
-    li.textContent = `${fecha} ▼ | Agua: ${wc}${sup ? ' | Sup: ' + sup : ''}`;
-    ul.append(li);
+    const sup = (JSON.parse(localStorage.getItem('suplementosPorDia') || '{}')[fecha] || []);
+    
+    // Crear cabecera del día con iconos
+    const dateHeader = document.createElement('div');
+    dateHeader.style.display = 'flex';
+    dateHeader.style.alignItems = 'center';
+    
+    const dateText = document.createElement('span');
+    dateText.innerHTML = `<strong>${fecha}</strong> <span class="toggle-icon">▼</span>`;
+    dateText.style.flex = '1';
+    
+    const badgesContainer = document.createElement('div');
+    badgesContainer.style.display = 'flex';
+    badgesContainer.style.gap = '10px';
+    badgesContainer.style.alignItems = 'center';
+    
+    // Badge de agua
+    const waterBadge = document.createElement('span');
+    waterBadge.innerHTML = `💧 ${wc}`;
+    waterBadge.style.backgroundColor = '#E1F5FE';
+    waterBadge.style.color = '#0288D1';
+    waterBadge.style.padding = '3px 8px';
+    waterBadge.style.borderRadius = '12px';
+    waterBadge.style.fontSize = '0.85rem';
+    badgesContainer.appendChild(waterBadge);
+    
+    // Badges de suplementos (si hay)
+    if (sup.length > 0) {
+      const supBadge = document.createElement('span');
+      supBadge.innerHTML = `💊 ${sup.length}`;
+      supBadge.title = sup.join(', ');
+      supBadge.style.backgroundColor = '#F3E5F5';
+      supBadge.style.color = '#7B1FA2';
+      supBadge.style.padding = '3px 8px';
+      supBadge.style.borderRadius = '12px';
+      supBadge.style.fontSize = '0.85rem';
+      badgesContainer.appendChild(supBadge);
+    }
+    
+    dateHeader.appendChild(dateText);
+    dateHeader.appendChild(badgesContainer);
+    li.appendChild(dateHeader);
+    
+    ul.appendChild(li);
+    
+    // Lista de comidas del día
     const inner = document.createElement('ul');
+    inner.style.margin = '0';
+    inner.style.padding = '0';
+    
     dias[fecha].forEach(({ item, idx }) => {
       const li2 = document.createElement('li');
-      li2.textContent = `${item.nombre}: `;
-      const spanSel = document.createElement('span');
-      // spanSel.textContent = `(${item.seleccion})`;
-      const iconos = {
-  proteinas: "🥩",
-  hidratos: "🍞",
-  frutas: "🍎",
-  colaciones: "🧁",
-  grasas: "🥑",
-  vegetales: "🥦"
-};
-const partes = item.seleccion.split(', ').map(pair => {
-  const [grupo, valor] = pair.split(': ');
-  const g = grupo.replace(/_/g, ' ').toUpperCase();
-  const base = grupo.split('_')[0]; // para proteinas_dm => proteinas
-  const icono = iconos[base] || '';
-  return `${icono} ${g} → ${valor}`;
-});
-spanSel.innerHTML = partes.join('<br>');
-      li2.append(spanSel);
+      
+      // Crear estructura para la comida en el historial
+      const comidaContainer = document.createElement('div');
+      comidaContainer.style.padding = '15px';
+      
+      // Cabecera con el nombre de la comida y botón de editar
+      const comidaHeader = document.createElement('div');
+      comidaHeader.style.display = 'flex';
+      comidaHeader.style.justifyContent = 'space-between';
+      comidaHeader.style.alignItems = 'center';
+      comidaHeader.style.marginBottom = '8px';
+      
+      const nombreComida = document.createElement('span');
+      nombreComida.className = 'historial-item-nombre';
+      nombreComida.textContent = item.nombre;
+      
       const btnEdit = document.createElement('button');
-      btnEdit.textContent = 'Editar';
-      btnEdit.style.marginLeft = '1em';
+      btnEdit.innerHTML = '✏️ Editar';
       btnEdit.onclick = () => editarHistorial(idx, li2);
-      li2.append(btnEdit);
-      inner.append(li2);
+      
+      comidaHeader.appendChild(nombreComida);
+      comidaHeader.appendChild(btnEdit);
+      comidaContainer.appendChild(comidaHeader);
+      
+      // Detalles de la selección con iconos
+      const spanSel = document.createElement('div');
+      spanSel.className = 'historial-item-seleccion';
+      
+      const iconos = {
+        proteinas: "🥩",
+        hidratos: "🍞",
+        frutas: "🍎",
+        colaciones: "🧁",
+        grasas: "🥑",
+        vegetales: "🥦"
+      };
+      
+      const detallesContainer = document.createElement('div');
+      detallesContainer.style.display = 'flex';
+      detallesContainer.style.flexDirection = 'column';
+      detallesContainer.style.gap = '5px';
+      
+      const partes = item.seleccion.split(', ').map(pair => {
+        const [grupo, valor] = pair.split(': ');
+        const g = grupo.replace(/_/g, ' ').toUpperCase();
+        const base = grupo.split('_')[0]; // para proteinas_dm => proteinas
+        const icono = iconos[base] || '';
+        
+        const detalleFila = document.createElement('div');
+        detalleFila.style.display = 'flex';
+        detalleFila.style.alignItems = 'center';
+        
+        const labelGrupo = document.createElement('span');
+        labelGrupo.innerHTML = `${icono} ${g}`;
+        labelGrupo.style.width = '180px';
+        labelGrupo.style.fontWeight = '500';
+        
+        const valorSpan = document.createElement('span');
+        valorSpan.textContent = valor;
+        valorSpan.style.color = '#555';
+        
+        detalleFila.appendChild(labelGrupo);
+        detalleFila.appendChild(valorSpan);
+        return detalleFila;
+      });
+      
+      partes.forEach(detalle => detallesContainer.appendChild(detalle));
+      spanSel.appendChild(detallesContainer);
+      comidaContainer.appendChild(spanSel);
+      
+      li2.appendChild(comidaContainer);
+      inner.appendChild(li2);
     });
-    ul.append(inner);
+    
+    ul.appendChild(inner);
+    
+    // Manejo de expansión/colapso
     let open = true;
-    li.onclick = () => {
+    const toggleIcon = li.querySelector('.toggle-icon');
+    
+    li.onclick = (e) => {
       open = !open;
       inner.style.display = open ? '' : 'none';
-      li.textContent = open
-        ? `${fecha} ▼ | Agua: ${wc}${sup ? ' | Sup: ' + sup : ''}`
-        : `${fecha} ▶ | Agua: ${wc}${sup ? ' | Sup: ' + sup : ''}`;
+      toggleIcon.textContent = open ? '▼' : '▶';
     };
   });
 }
@@ -765,41 +965,48 @@ function mostrarMensaje(mensaje, tipo = 'info') {
   if (!msgContainer) {
     msgContainer = document.createElement('div');
     msgContainer.id = 'mensaje-container';
-    msgContainer.style.position = 'fixed';
-    msgContainer.style.top = '10px';
-    msgContainer.style.right = '10px';
-    msgContainer.style.zIndex = '1000';
+    msgContainer.className = 'mensaje-container';
     document.body.appendChild(msgContainer);
   }
 
   // Crear el mensaje
   const msgElement = document.createElement('div');
   msgElement.className = `mensaje ${tipo}`;
-  msgElement.textContent = mensaje;
-  msgElement.style.padding = '10px 15px';
-  msgElement.style.marginBottom = '10px';
-  msgElement.style.borderRadius = '4px';
-  msgElement.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-
-  // Estilos según el tipo
+  
+  // Agregar icono según el tipo
+  let icono = '';
   if (tipo === 'success') {
-    msgElement.style.backgroundColor = '#4CAF50';
-    msgElement.style.color = 'white';
+    icono = '✅';
   } else if (tipo === 'error') {
-    msgElement.style.backgroundColor = '#F44336';
-    msgElement.style.color = 'white';
+    icono = '❌';
   } else {
-    msgElement.style.backgroundColor = '#2196F3';
-    msgElement.style.color = 'white';
+    icono = 'ℹ️';
   }
+  
+  msgElement.innerHTML = `<div class="mensaje-contenido"><span class="mensaje-icono">${icono}</span> ${mensaje}</div>`;
+  
+  // Agregar botón de cerrar
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.className = 'mensaje-cerrar';
+  closeBtn.onclick = () => msgContainer.removeChild(msgElement);
+  msgElement.querySelector('.mensaje-contenido').appendChild(closeBtn);
 
   // Agregar al contenedor
   msgContainer.appendChild(msgElement);
 
+  // Animación de entrada
+  setTimeout(() => msgElement.classList.add('visible'), 10);
+
   // Auto-eliminar después de 4 segundos
   setTimeout(() => {
     if (msgElement.parentNode) {
-      msgElement.parentNode.removeChild(msgElement);
+      msgElement.classList.remove('visible');
+      setTimeout(() => {
+        if (msgElement.parentNode) {
+          msgElement.parentNode.removeChild(msgElement);
+        }
+      }, 300); // Tiempo para la animación de salida
     }
   }, 4000);
 }
@@ -850,25 +1057,22 @@ function renderOpcionesForm() {
   // Primero, renderizar la sección para configurar grupos de comidas
   const configSection = document.createElement('div');
   configSection.className = 'config-grupos-section';
-  configSection.style.width = '100%';
-  configSection.style.marginBottom = '2em';
 
   const h3 = document.createElement('h3');
-  h3.textContent = 'Configurar Dropdowns por Comida';
+  h3.textContent = 'Configurar Grupos por Comida';
   configSection.appendChild(h3);
 
   // Crear pestañas para entrenamiento y no entrenamiento
   const tabsDiv = document.createElement('div');
   tabsDiv.className = 'dropdown-config-tabs';
-  tabsDiv.style.marginBottom = '1em';
 
   const btnEntrenamiento = document.createElement('button');
-  btnEntrenamiento.textContent = 'Día de entrenamiento';
+  btnEntrenamiento.textContent = '💪 Día de entrenamiento';
   btnEntrenamiento.className = 'config-tab active';
   btnEntrenamiento.onclick = () => mostrarConfigComidas('entrenamiento');
 
   const btnNoEntrenamiento = document.createElement('button');
-  btnNoEntrenamiento.textContent = 'Día sin entrenamiento';
+  btnNoEntrenamiento.textContent = '🛋️ Día sin entrenamiento';
   btnNoEntrenamiento.className = 'config-tab';
   btnNoEntrenamiento.onclick = () => mostrarConfigComidas('no_entrenamiento');
 
@@ -903,74 +1107,142 @@ function renderOpcionesForm() {
     lista.forEach(comida => {
       const comidaDiv = document.createElement('div');
       comidaDiv.className = 'comida-grupos';
-      comidaDiv.style.marginBottom = '1em';
-      comidaDiv.style.padding = '1em';
-      comidaDiv.style.border = '1px solid #e0e0e0';
-      comidaDiv.style.borderRadius = '8px';
+      
+      // Encabezado de la comida con estilo mejorado
+      const comidaHeader = document.createElement('div');
+      comidaHeader.style.display = 'flex';
+      comidaHeader.style.alignItems = 'center';
+      comidaHeader.style.justifyContent = 'space-between';
+      comidaHeader.style.marginBottom = '12px';
+      comidaHeader.style.paddingBottom = '8px';
+      comidaHeader.style.borderBottom = '1px solid #e0e0e0';
 
       const h4 = document.createElement('h4');
       h4.textContent = comida.nombre;
-      h4.style.marginTop = '0';
-      comidaDiv.appendChild(h4);
+      h4.style.margin = '0';
+      h4.style.color = '#388E3C';
+      
+      // Contador de grupos
+      const grupoCount = document.createElement('span');
+      grupoCount.textContent = `${comida.grupos.length} grupo(s)`;
+      grupoCount.style.fontSize = '0.85rem';
+      grupoCount.style.color = '#757575';
+      
+      comidaHeader.appendChild(h4);
+      comidaHeader.appendChild(grupoCount);
+      comidaDiv.appendChild(comidaHeader);
 
-      // Listar los grupos actuales
-      const gruposUl = document.createElement('ul');
-      gruposUl.style.listStyleType = 'none';
-      gruposUl.style.padding = '0';
+      // Listar los grupos actuales con estilo mejorado
+      if (comida.grupos.length > 0) {
+        const gruposContainer = document.createElement('div');
+        gruposContainer.style.marginBottom = '15px';
 
-      comida.grupos.forEach(grupo => {
-        const li = document.createElement('li');
-        li.style.display = 'flex';
-        li.style.alignItems = 'center';
-        li.style.marginBottom = '0.5em';
+        comida.grupos.forEach(grupo => {
+          const grupoItem = document.createElement('div');
+          grupoItem.style.display = 'flex';
+          grupoItem.style.alignItems = 'center';
+          grupoItem.style.justifyContent = 'space-between';
+          grupoItem.style.padding = '8px 10px';
+          grupoItem.style.marginBottom = '5px';
+          grupoItem.style.backgroundColor = '#f5f5f5';
+          grupoItem.style.borderRadius = '4px';
+          grupoItem.style.borderLeft = '3px solid #4CAF50';
+          
+          // Iconos para cada tipo de grupo
+          const iconos = {
+            proteinas: "🥩",
+            hidratos: "🍞",
+            frutas: "🍎",
+            colaciones: "🧁",
+            grasas: "🥑",
+            vegetales: "🥦"
+          };
+          const base = grupo.split('_')[0];
+          const icono = iconos[base] || '';
+          
+          const grupoLabel = document.createElement('div');
+          grupoLabel.innerHTML = `<span class="grupo-icono">${icono}</span> ${grupo.replace(/_/g, ' ').toUpperCase()}`;
+          
+          const btnQuitar = document.createElement('button');
+          btnQuitar.className = 'btn-delete';
+          btnQuitar.innerHTML = '✖';
+          btnQuitar.title = 'Quitar este grupo';
+          btnQuitar.style.minWidth = 'unset';
+          btnQuitar.style.width = '30px';
+          btnQuitar.style.height = '30px';
+          btnQuitar.style.padding = '0';
+          btnQuitar.style.display = 'flex';
+          btnQuitar.style.justifyContent = 'center';
+          btnQuitar.style.alignItems = 'center';
+          btnQuitar.onclick = () => {
+            if (modificarGruposComida(comida.nombre, tipoDia, grupo, 'quitar')) {
+              mostrarMensaje(`Grupo ${grupo.toUpperCase()} eliminado de ${comida.nombre}`, 'success');
+              mostrarConfigComidas(tipoDia);
+            }
+          };
+          
+          grupoItem.appendChild(grupoLabel);
+          grupoItem.appendChild(btnQuitar);
+          gruposContainer.appendChild(grupoItem);
+        });
+        
+        comidaDiv.appendChild(gruposContainer);
+      } else {
+        // Mostrar mensaje si no hay grupos
+        const emptyMessage = document.createElement('p');
+        emptyMessage.textContent = 'No hay grupos configurados para esta comida.';
+        emptyMessage.style.color = '#757575';
+        emptyMessage.style.fontStyle = 'italic';
+        comidaDiv.appendChild(emptyMessage);
+      }
 
-        const grupoLabel = document.createElement('span');
-        grupoLabel.textContent = grupo.replace(/_/g, ' ').toUpperCase();
-        grupoLabel.style.flex = '1';
-        li.appendChild(grupoLabel);
-
-        const btnQuitar = document.createElement('button');
-        btnQuitar.textContent = '➖ Quitar';
-        btnQuitar.onclick = () => {
-          if (modificarGruposComida(comida.nombre, tipoDia, grupo, 'quitar')) {
-            mostrarConfigComidas(tipoDia);
-          }
-        };
-        li.appendChild(btnQuitar);
-        gruposUl.appendChild(li);
-      });
-
-      comidaDiv.appendChild(gruposUl);
-
-      // Selector para añadir grupos
+      // Selector para añadir grupos con mejor estilo
       const addGroupDiv = document.createElement('div');
-      addGroupDiv.style.marginTop = '1em';
       addGroupDiv.style.display = 'flex';
       addGroupDiv.style.alignItems = 'center';
+      addGroupDiv.style.marginTop = '10px';
 
       const select = document.createElement('select');
       select.id = `select-add-grupo-${comida.nombre}-${tipoDia}`;
       select.style.flex = '1';
-      select.style.marginRight = '0.5em';
+      select.style.padding = '8px 12px';
+      select.style.borderRadius = '4px';
+      select.style.border = '1px solid #ddd';
+      select.style.marginRight = '10px';
 
-      // Opciones disponibles para añadir
+      // Opciones disponibles para añadir con iconos
       const opcionesGrupo = [
         'proteinas', 'hidratos', 'frutas', 'grasas', 'vegetales', 'colaciones',
         'proteinas_dm', 'hidratos_dm', 'frutas_no_entrenamiento', 'proteinas_dm_no_entrenamiento'
       ];
+      
+      const iconos = {
+        proteinas: "🥩",
+        hidratos: "🍞",
+        frutas: "🍎",
+        colaciones: "🧁",
+        grasas: "🥑",
+        vegetales: "🥦"
+      };
 
       opcionesGrupo.forEach(opt => {
         const option = document.createElement('option');
         option.value = opt;
-        option.textContent = opt.replace(/_/g, ' ').toUpperCase();
+        
+        const base = opt.split('_')[0];
+        const icono = iconos[base] || '';
+        option.textContent = `${icono} ${opt.replace(/_/g, ' ').toUpperCase()}`;
+        
         select.appendChild(option);
       });
 
       const btnAdd = document.createElement('button');
-      btnAdd.textContent = '➕ Agregar';
+      btnAdd.className = 'btn-outline';
+      btnAdd.innerHTML = '➕ Agregar';
       btnAdd.onclick = () => {
         const grupoSeleccionado = select.value;
         if (modificarGruposComida(comida.nombre, tipoDia, grupoSeleccionado, 'agregar')) {
+          mostrarMensaje(`Grupo ${grupoSeleccionado.toUpperCase()} agregado a ${comida.nombre}`, 'success');
           mostrarConfigComidas(tipoDia);
         }
       };
@@ -988,72 +1260,130 @@ function renderOpcionesForm() {
 
   cont.appendChild(configSection);
 
-  // Continuar con la renderización original de opciones de dropdowns
+  // Agregar separador visual
+  const separator = document.createElement('div');
+  separator.style.margin = '30px 0';
+  separator.style.borderTop = '1px solid #e0e0e0';
+  cont.appendChild(separator);
+
+  // Título para la sección de alimentos
+  const tituloAlimentos = document.createElement('h3');
+  tituloAlimentos.textContent = 'Configuración de Alimentos';
+  tituloAlimentos.style.marginBottom = '20px';
+  cont.appendChild(tituloAlimentos);
+
+  // Contenedor flexible para las tarjetas de opciones
+  const opcionesGrid = document.createElement('div');
+  opcionesGrid.className = 'opciones-form';
+  cont.appendChild(opcionesGrid);
+
+  // Renderizar opciones de alimentos
   Object.keys(opciones).forEach(grupoKey => {
     const div = document.createElement('div');
-    div.style.marginBottom = '1.5em';
+    div.className = 'grupo-opciones';
+    
     // Mostrar el nombre del grupo sin guiones bajos y en mayúsculas
     const labelGrupo = grupoKey.replace(/_/g, ' ').toUpperCase();
-// Después (reemplazo):
-const iconos = {
-  proteinas: "🥩",
-  hidratos: "🍞",
-  frutas: "🍎",
-  colaciones: "🧁",
-  grasas: "🥑",
-  vegetales: "🥦"
-};
-const base = grupoKey.split('_')[0]; // Para agarrar 'proteinas' de 'proteinas_dm'
-const icono = iconos[base] || '';
-div.innerHTML = `<strong data-icon="${icono}">${labelGrupo}</strong>`;
+    
+    // Agregar icono al grupo
+    const iconos = {
+      proteinas: "🥩",
+      hidratos: "🍞",
+      frutas: "🍎",
+      colaciones: "🧁",
+      grasas: "🥑",
+      vegetales: "🥦",
+      suplementos: "💊"
+    };
+    const base = grupoKey.split('_')[0]; // Para agarrar 'proteinas' de 'proteinas_dm'
+    const icono = iconos[base] || '';
+    
+    div.innerHTML = `<strong><span class="grupo-icono">${icono}</span> ${labelGrupo}</strong>`;
 
+    // Lista de opciones actuales
     const ul = document.createElement('ul');
     if (Array.isArray(current[grupoKey])) {
-      current[grupoKey].forEach((opt, idx) => {
+      if (current[grupoKey].length === 0) {
         const li = document.createElement('li');
-        li.textContent = opt;
-        const btnDel = document.createElement('button');
-        btnDel.textContent = 'Eliminar';
-        btnDel.style.marginLeft = '1em';
-        btnDel.onclick = () => {
-          current[grupoKey].splice(idx, 1);
-          setOpciones(current);
-          renderOpcionesForm();
-          cargarComidas();
-        };
-        li.append(btnDel);
-        ul.append(li);
-      });
-    } else {
-      const li = document.createElement('li');
-      li.textContent = '(Sin opciones)';
-      ul.append(li);
+        li.textContent = '(Sin opciones)';
+        li.style.fontStyle = 'italic';
+        li.style.color = '#757575';
+        li.style.borderBottom = 'none';
+        ul.appendChild(li);
+      } else {
+        current[grupoKey].forEach((opt, idx) => {
+          const li = document.createElement('li');
+          
+          const optionText = document.createElement('span');
+          optionText.textContent = opt;
+          
+          const btnDel = document.createElement('button');
+          btnDel.innerHTML = '✖';
+          btnDel.className = 'btn-delete';
+          btnDel.style.minWidth = 'unset';
+          btnDel.style.width = '30px';
+          btnDel.style.height = '30px';
+          btnDel.style.padding = '0';
+          btnDel.title = 'Eliminar este alimento';
+          
+          btnDel.onclick = () => {
+            current[grupoKey].splice(idx, 1);
+            setOpciones(current);
+            mostrarMensaje(`Opción "${opt}" eliminada de ${labelGrupo}`, 'info');
+            renderOpcionesForm();
+            cargarComidas();
+          };
+          
+          li.appendChild(optionText);
+          li.appendChild(btnDel);
+          ul.appendChild(li);
+        });
+      }
     }
-    div.append(ul);
+    div.appendChild(ul);
+    
+    // Formulario para agregar nuevas opciones
+    const addForm = document.createElement('div');
+    addForm.style.display = 'flex';
+    addForm.style.marginTop = '15px';
+    
     const inp = document.createElement('input');
     inp.type = 'text';
-    inp.placeholder = `Agregar opción a ${labelGrupo}`;
-    inp.style.marginRight = '0.5em';
+    inp.placeholder = `Nuevo alimento...`;
+    inp.style.flex = '1';
+    
     const btnAdd = document.createElement('button');
     btnAdd.textContent = 'Agregar';
+    btnAdd.style.marginLeft = '10px';
+    
     btnAdd.onclick = () => {
       const val = inp.value.trim();
       if (!Array.isArray(current[grupoKey])) current[grupoKey] = [];
+      
       if (val && !current[grupoKey].includes(val)) {
         current[grupoKey].push(val);
         setOpciones(current);
+        mostrarMensaje(`Opción "${val}" agregada a ${labelGrupo}`, 'success');
         renderOpcionesForm();
         cargarComidas();
         inp.value = '';
+      } else if (val && current[grupoKey].includes(val)) {
+        mostrarMensaje(`La opción "${val}" ya existe en ${labelGrupo}`, 'error');
       }
     };
-    div.append(inp);
-    div.append(btnAdd);
-    cont.append(div);
-
-    if (grupoKey === 'suplementos') {
-      cargarSuplementosDia();
-    }
+    
+    // También permitir agregar con Enter
+    inp.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        btnAdd.click();
+      }
+    });
+    
+    addForm.appendChild(inp);
+    addForm.appendChild(btnAdd);
+    div.appendChild(addForm);
+    
+    opcionesGrid.appendChild(div);
   });
 }
 
