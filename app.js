@@ -39,6 +39,19 @@ function exportarHistorialCSV() {
     csv += `"${grupo}","${valores.join(' | ')}"\n`;
   });
 
+  // Agregar la configuración de grupos por comida
+  csv += '\nConfiguración de Comidas - Entrenamiento\n';
+  const comidasEntrenamientoSaved = JSON.parse(localStorage.getItem('comidasEntrenamiento') || 'null') || comidasEntrenamiento;
+  comidasEntrenamientoSaved.forEach(comida => {
+    csv += `"${comida.nombre}","${comida.grupos.join(' | ')}"\n`;
+  });
+
+  csv += '\nConfiguración de Comidas - Sin Entrenamiento\n';
+  const comidasNoEntrenamientoSaved = JSON.parse(localStorage.getItem('comidasNoEntrenamiento') || 'null') || comidasNoEntrenamiento;
+  comidasNoEntrenamientoSaved.forEach(comida => {
+    csv += `"${comida.nombre}","${comida.grupos.join(' | ')}"\n`;
+  });
+
   const BOM = '\uFEFF';
   const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
@@ -66,6 +79,37 @@ function importarHistorialCSV(file) {
     let opcionesStart = lines.findIndex(l => l.toLowerCase().includes('opciones de dropdowns'));
     let historialLines = opcionesStart > -1 ? lines.slice(0, opcionesStart) : lines;
     let opcionesLines = opcionesStart > -1 ? lines.slice(opcionesStart + 1) : [];
+
+    // Buscar secciones de configuración de comidas
+    let entrenamientoStart = lines.findIndex(l => l.toLowerCase().includes('configuración de comidas - entrenamiento'));
+    let noEntrenamientoStart = lines.findIndex(l => l.toLowerCase().includes('configuración de comidas - sin entrenamiento'));
+
+    console.log('Líneas en CSV:', lines.length);
+    console.log('Posición de sección entrenamiento:', entrenamientoStart);
+    console.log('Posición de sección no entrenamiento:', noEntrenamientoStart);
+
+    // Extraer líneas de cada sección correctamente
+    let entrenamientoLines = [];
+    let noEntrenamientoLines = [];
+
+    if (entrenamientoStart > -1) {
+      // Buscar el final de la sección de entrenamiento
+      const finEntrenamiento = noEntrenamientoStart > -1 ? noEntrenamientoStart :
+                              lines.findIndex((l, i) => i > entrenamientoStart && l.trim() === '');
+
+      const endIdx = finEntrenamiento > -1 ? finEntrenamiento : lines.length;
+      entrenamientoLines = lines.slice(entrenamientoStart + 1, endIdx).filter(l => l.trim() && l.includes(','));
+      console.log('Líneas de entrenamiento encontradas:', entrenamientoLines.length);
+    }
+
+    if (noEntrenamientoStart > -1) {
+      // Buscar el final de la sección de no entrenamiento
+      const finNoEntrenamiento = lines.findIndex((l, i) => i > noEntrenamientoStart && l.trim() === '');
+
+      const endIdx = finNoEntrenamiento > -1 ? finNoEntrenamiento : lines.length;
+      noEntrenamientoLines = lines.slice(noEntrenamientoStart + 1, endIdx).filter(l => l.trim() && l.includes(','));
+      console.log('Líneas de no entrenamiento encontradas:', noEntrenamientoLines.length);
+    }
 
     // Procesar historial
     const headers = historialLines[0].split(',');
@@ -122,13 +166,115 @@ function importarHistorialCSV(file) {
       cargarComidas();
     }
 
+    // Procesar configuración de comidas
+    // Para días de entrenamiento
+    if (entrenamientoLines.length) {
+      console.log('Procesando líneas de entrenamiento:', entrenamientoLines);
+
+      // Crear una copia de la configuración original como referencia
+      const configOriginal = JSON.parse(JSON.stringify(comidasEntrenamiento));
+
+      // Mapear las líneas a objetos de comida
+      const nuevasComidasEntrenamiento = entrenamientoLines.map(line => {
+        const parts = line.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
+        if (parts.length >= 2) {
+          const nombre = (parts[0]||'').replace(/(^\"|\"$)/g, '').trim();
+          const grupos = (parts[1]||'').replace(/(^\"|\"$)/g, '').split(' | ').map(s=>s.trim()).filter(Boolean);
+
+          // Buscar el tipo correspondiente en la configuración original
+          const comidaOriginal = configOriginal.find(c => c.nombre === nombre);
+          const tipo = comidaOriginal ? comidaOriginal.tipo : null;
+
+          return { nombre, tipo, grupos };
+        }
+        return null;
+      }).filter(Boolean); // Eliminar cualquier null
+
+      if (nuevasComidasEntrenamiento.length) {
+        console.log('Guardando nueva configuración de entrenamiento:', nuevasComidasEntrenamiento);
+        localStorage.setItem('comidasEntrenamiento', JSON.stringify(nuevasComidasEntrenamiento));
+
+        // Actualizar la referencia en memoria
+        comidasEntrenamiento.length = 0; // Vaciar el array
+        nuevasComidasEntrenamiento.forEach(c => comidasEntrenamiento.push(c));
+      }
+    }
+
+    // Para días sin entrenamiento
+    if (noEntrenamientoLines.length) {
+      console.log('Procesando líneas sin entrenamiento:', noEntrenamientoLines);
+
+      // Crear una copia de la configuración original como referencia
+      const configOriginal = JSON.parse(JSON.stringify(comidasNoEntrenamiento));
+
+      // Mapear las líneas a objetos de comida
+      const nuevasComidasNoEntrenamiento = noEntrenamientoLines.map(line => {
+        const parts = line.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
+        if (parts.length >= 2) {
+          const nombre = (parts[0]||'').replace(/(^\"|\"$)/g, '').trim();
+          const grupos = (parts[1]||'').replace(/(^\"|\"$)/g, '').split(' | ').map(s=>s.trim()).filter(Boolean);
+
+          // Buscar el tipo correspondiente en la configuración original
+          const comidaOriginal = configOriginal.find(c => c.nombre === nombre);
+          const tipo = comidaOriginal ? comidaOriginal.tipo : null;
+
+          return { nombre, tipo, grupos };
+        }
+        return null;
+      }).filter(Boolean); // Eliminar cualquier null
+
+      if (nuevasComidasNoEntrenamiento.length) {
+        console.log('Guardando nueva configuración sin entrenamiento:', nuevasComidasNoEntrenamiento);
+        localStorage.setItem('comidasNoEntrenamiento', JSON.stringify(nuevasComidasNoEntrenamiento));
+
+        // Actualizar la referencia en memoria
+        comidasNoEntrenamiento.length = 0; // Vaciar el array
+        nuevasComidasNoEntrenamiento.forEach(c => comidasNoEntrenamiento.push(c));
+      }
+    }
+
+    // Recargar todos los datos necesarios
+    cargarComidas();
     cargarHistorial();
-    alert('Historial y opciones importados correctamente.');
+
+    // Si estamos en la pestaña de opciones, actualizar el formulario de configuración
+    if (tabActual === 'opciones') {
+      renderOpcionesForm();
+    }
+
+    mostrarMensaje('Historial, opciones y configuración de comidas importados correctamente', 'success');
   };
   reader.readAsText(file, 'UTF-8');
 }
 
+// Función para cargar la configuración de comidas desde localStorage
+function cargarConfiguracionComidas() {
+  // Cargar configuración para días de entrenamiento
+  const entrenamientoSaved = JSON.parse(localStorage.getItem('comidasEntrenamiento')) || [];
+  if (entrenamientoSaved.length > 0) {
+    // Vaciar el array existente y llenarlo con nuevos valores
+    comidasEntrenamiento.length = 0;
+    entrenamientoSaved.forEach(item => comidasEntrenamiento.push(item));
+  }
+
+  // Cargar configuración para días sin entrenamiento
+  const noEntrenamientoSaved = JSON.parse(localStorage.getItem('comidasNoEntrenamiento')) || [];
+  if (noEntrenamientoSaved.length > 0) {
+    // Vaciar el array existente y llenarlo con nuevos valores
+    comidasNoEntrenamiento.length = 0;
+    noEntrenamientoSaved.forEach(item => comidasNoEntrenamiento.push(item));
+  }
+
+  console.log('Configuración de comidas cargada:', {
+    entrenamiento: comidasEntrenamiento.length,
+    noEntrenamiento: comidasNoEntrenamiento.length
+  });
+}
+
 // — Datos y lógica core de la app —
+
+// Variable global para seguir la pestaña activa
+let tabActual = 'principal';
 
 // 🧠 Aquí están todas las opciones para los dropdowns agrupadas por tipo
 const opciones = {
@@ -608,6 +754,52 @@ function setWaterCount(key, v) {
   localStorage.setItem('waterCounts', JSON.stringify(m));
 }
 
+// Función para mostrar mensajes al usuario
+function mostrarMensaje(mensaje, tipo = 'info') {
+  // Crear o recuperar el contenedor de mensajes
+  let msgContainer = document.getElementById('mensaje-container');
+  if (!msgContainer) {
+    msgContainer = document.createElement('div');
+    msgContainer.id = 'mensaje-container';
+    msgContainer.style.position = 'fixed';
+    msgContainer.style.top = '10px';
+    msgContainer.style.right = '10px';
+    msgContainer.style.zIndex = '1000';
+    document.body.appendChild(msgContainer);
+  }
+
+  // Crear el mensaje
+  const msgElement = document.createElement('div');
+  msgElement.className = `mensaje ${tipo}`;
+  msgElement.textContent = mensaje;
+  msgElement.style.padding = '10px 15px';
+  msgElement.style.marginBottom = '10px';
+  msgElement.style.borderRadius = '4px';
+  msgElement.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+
+  // Estilos según el tipo
+  if (tipo === 'success') {
+    msgElement.style.backgroundColor = '#4CAF50';
+    msgElement.style.color = 'white';
+  } else if (tipo === 'error') {
+    msgElement.style.backgroundColor = '#F44336';
+    msgElement.style.color = 'white';
+  } else {
+    msgElement.style.backgroundColor = '#2196F3';
+    msgElement.style.color = 'white';
+  }
+
+  // Agregar al contenedor
+  msgContainer.appendChild(msgElement);
+
+  // Auto-eliminar después de 4 segundos
+  setTimeout(() => {
+    if (msgElement.parentNode) {
+      msgElement.parentNode.removeChild(msgElement);
+    }
+  }, 4000);
+}
+
 // Función para modificar los grupos de comidas (añadir/quitar dropdowns)
 function modificarGruposComida(comidaNombre, tipoComida, grupo, accion) {
   const lista = tipoComida === 'entrenamiento' ? comidasEntrenamiento : comidasNoEntrenamiento;
@@ -854,31 +1046,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (e.target.files[0]) importarHistorialCSV(e.target.files[0]);
   };
 
-  // Cargar configuraciones de comidas desde localStorage si existen
-  const entrenamientoSaved = localStorage.getItem('comidasEntrenamiento');
-  const noEntrenamientoSaved = localStorage.getItem('comidasNoEntrenamiento');
-
-  if (entrenamientoSaved) {
-    try {
-      const parsed = JSON.parse(entrenamientoSaved);
-      if (Array.isArray(parsed) && parsed.length) {
-        Object.assign(comidasEntrenamiento, parsed);
-      }
-    } catch (e) {
-      console.error('Error al cargar comidasEntrenamiento:', e);
-    }
-  }
-
-  if (noEntrenamientoSaved) {
-    try {
-      const parsed = JSON.parse(noEntrenamientoSaved);
-      if (Array.isArray(parsed) && parsed.length) {
-        Object.assign(comidasNoEntrenamiento, parsed);
-      }
-    } catch (e) {
-      console.error('Error al cargar comidasNoEntrenamiento:', e);
-    }
-  }
+  // Cargar configuraciones de comidas usando la función dedicada
+  cargarConfiguracionComidas();
 
   cargarComidas();
   // Cambiar comidas al cambiar tipo de día
@@ -910,6 +1079,9 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tab-content-' + tab).style.display = '';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
+    // Actualizar variable global de pestaña actual
+    tabActual = tab;
+    console.log('Cambio de pestaña a:', tabActual);
   }
   document.getElementById('tab-principal').onclick = () => showTab('principal');
   document.getElementById('tab-historial').onclick = () => showTab('historial');
