@@ -152,6 +152,22 @@ nav {
   font-size: 16px;
 }
 
+/* Dropdown más pequeño para selección de grupos - ACTUALIZADO */
+#select-add-grupo-Desayuno-entrenamiento,
+#select-add-grupo-Almuerzo-entrenamiento,
+#select-add-grupo-Merienda-entrenamiento,
+#select-add-grupo-Cena-entrenamiento,
+#select-add-grupo-Desayuno-no-entrenamiento,
+#select-add-grupo-Almuerzo-no-entrenamiento,
+#select-add-grupo-Merienda-no-entrenamiento,
+#select-add-grupo-Cena-no-entrenamiento {
+  padding: 4px 6px !important;
+  font-size: 0.8rem !important;
+  height: 28px !important;
+  width: auto !important;
+  min-width: 120px !important;
+}
+
 /* Botones */
 button {
   padding: 8px 16px;
@@ -529,4 +545,21 @@ footer {
     margin-left: 0;
     margin-top: 10px;
   }
+
+  /* Eliminar margen derecho del botón agregar en mobile */
+  .btn-add {
+    margin-right: 0;
+  }
+}
+
+/* Ajustes específicos para elementos en configuración de grupos */
+#dropdown-config-contenido button.btn-add,
+#dropdown-config-contenido button.btn-outline {
+  margin-right: 0;
+}
+
+/* Eliminar margen derecho de los botones de comidas */
+button.btn-completar,
+.comidas-lista button.btn-secondary {
+  margin-right: 0;
 }

@@ -685,6 +685,7 @@ function cargarComidas() {
       comidaHeader.appendChild(badge);
     } else {
       btn.textContent = 'Marcar como completada';
+      btn.className = 'btn-completar';
       btn.onclick = () => marcarComida(i);
     }
 
