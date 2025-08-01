@@ -282,7 +282,16 @@ let tabActual = 'principal';
 
 // 🧠 Aquí están todas las opciones para los dropdowns agrupadas por tipo
 const opciones = {
-  proteinas_dm: [
+  proteinas_desayuno_merienda: [
+    "Vaso de leche (250cc)",
+    "Vaso de yogur (200cc)",
+    "Porción de queso (70gr)",
+    "Fetas de queso (4u)",
+    "Fetas de jamon (4u)",
+    "Queso untable (2 cdas)",
+    "Huevo entero (3u)"
+  ],
+  proteinas_desayuno_merienda_no_entrenamiento: [
     "Vaso de leche (250cc)",
     "Vaso de yogur (200cc)",
     "Porción de queso (70gr)",
@@ -290,15 +299,7 @@ const opciones = {
     "Queso untable (2 cdas)",
     "Huevo entero (3u)"
   ],
-  proteinas_dm_no_entrenamiento: [
-    "Vaso de leche (250cc)",
-    "Vaso de yogur (200cc)",
-    "Porción de queso (70gr)",
-    "Fetas de queso (4u)",
-    "Queso untable (2 cdas)",
-    "Huevo entero (3u)"
-  ],
-  hidratos_dm: [
+  hidratos_desayuno_merienda: [
     "Pan lactal integral (4u)",
     "Pan de mesa (8u)",
     "Tostada de arroz (6u)",
@@ -429,7 +430,7 @@ const opciones = {
 const comidasEntrenamiento = [
   {
     nombre: "Desayuno",  // nombre visible en pantalla
-    tipo: "dm",          // clave que determina qué grupo de opciones se usa ("dm" = desayuno/merienda)
+    tipo: "desayuno_merienda",          // clave que determina qué grupo de opciones se usa ("desayuno_merienda")
     grupos: [
       "proteinas",       // primer dropdown de proteínas
       "proteinas",       // segundo dropdown de proteínas (agregado nuevo)
@@ -445,7 +446,7 @@ const comidasEntrenamiento = [
   },
   {
     nombre: "Merienda",
-    tipo: "dm",
+    tipo: "desayuno_merienda",
     grupos: [
       "proteinas",       // primer dropdown de proteínas
       "proteinas",       // segundo dropdown de proteínas (agregado nuevo)
@@ -470,7 +471,7 @@ const comidasNoEntrenamiento = [
   {
     nombre: "Desayuno",
     tipo: "no_entrenamiento",
-    grupos: ["proteinas_dm_no_entrenamiento", "frutas_no_entrenamiento"]
+    grupos: ["proteinas_desayuno_merienda_no_entrenamiento", "frutas_no_entrenamiento"]
   },
   {
     nombre: "Almuerzo",
@@ -480,7 +481,7 @@ const comidasNoEntrenamiento = [
   {
     nombre: "Merienda",
     tipo: "no_entrenamiento",
-    grupos: ["proteinas_dm_no_entrenamiento", "frutas_no_entrenamiento"]
+    grupos: ["proteinas_desayuno_merienda_no_entrenamiento", "frutas_no_entrenamiento"]
   },
   {
     nombre: "Cena",
@@ -517,8 +518,8 @@ function crearSelector(grupo, idx, tipo, selected = null) {
     key = `${grupo}_almuerzo_no_entrenamiento`;
   } else if (tipo === "cena") {
     key = `${grupo}_cena`;
-  } else if ((grupo === "proteinas" || grupo === "hidratos") && tipo === "dm") {
-    key = `${grupo}_dm`;
+  } else if ((grupo === "proteinas" || grupo === "hidratos") && tipo === "desayuno_merienda") {
+    key = `${grupo}_desayuno_merienda`;
   } else {
     key = grupo;
   }
@@ -642,8 +643,9 @@ function cargarComidas() {
       const grupoDiv = document.createElement('div');
       grupoDiv.className = 'grupo-dropdown';
 
+      // Mostrar el nombre completo del grupo
+      const base = g.split('_')[0]; // Para obtener el icono correspondiente
       const labelGrupo = g.replace(/_/g, ' ').toUpperCase();
-      const base = g.split('_')[0]; // Para agarrar 'proteinas' de 'proteinas_dm'
       const icono = iconos[base] || '';
 
       const label = document.createElement('label');
@@ -753,10 +755,10 @@ function editarHistorial(idx, container) {
 };
 grupos.forEach(g => {
   const lbl = document.createElement('label');
-  const labelGrupo = g.replace(/_/g, ' ').toUpperCase();
   const base = g.split('_')[0];
+  const labelGrupo = g.replace(/_/g, ' ').toUpperCase();
   const icono = iconos[base] || '';
-  lbl.innerHTML = `<span style="display:inline-block; min-width:120px">${icono} ${labelGrupo}</span>`;
+  lbl.innerHTML = `<span style="display:inline-block; min-width:200px">${icono} ${labelGrupo}</span>`;
   lbl.appendChild(crearSelector(g, idx, tipo, currentMap[g]));
   lbl.style.marginBottom = '0.5em';
   lbl.style.flexDirection = 'column';
@@ -907,7 +909,7 @@ function cargarHistorial() {
       const partes = item.seleccion.split(', ').map(pair => {
         const [grupo, valor] = pair.split(': ');
         const g = grupo.replace(/_/g, ' ').toUpperCase();
-        const base = grupo.split('_')[0]; // para proteinas_dm => proteinas
+        const base = grupo.split('_')[0]; // para proteinas_desayuno_merienda => proteinas
         const icono = iconos[base] || '';
 
         const detalleFila = document.createElement('div');
@@ -915,8 +917,10 @@ function cargarHistorial() {
         detalleFila.style.alignItems = 'center';
 
         const labelGrupo = document.createElement('span');
-        labelGrupo.innerHTML = `${icono} ${g}`;
-        labelGrupo.style.width = '180px';
+        // Mostrar el nombre completo del grupo
+        const nombreCompleto = grupo.replace(/_/g, ' ').toUpperCase();
+        labelGrupo.innerHTML = `${icono} ${nombreCompleto}`;
+        labelGrupo.style.width = '240px';
         labelGrupo.style.fontWeight = '500';
 
         const valorSpan = document.createElement('span');
@@ -1214,7 +1218,7 @@ function renderOpcionesForm() {
       // Opciones disponibles para añadir con iconos
       const opcionesGrupo = [
         'proteinas', 'hidratos', 'frutas', 'grasas', 'vegetales', 'colaciones',
-        'proteinas_dm', 'hidratos_dm', 'frutas_no_entrenamiento', 'proteinas_dm_no_entrenamiento'
+        'proteinas_desayuno_merienda', 'hidratos_desayuno_merienda', 'frutas_no_entrenamiento', 'proteinas_desayuno_merienda_no_entrenamiento'
       ];
 
       const iconos = {
@@ -1283,7 +1287,8 @@ function renderOpcionesForm() {
     const div = document.createElement('div');
     div.className = 'grupo-opciones';
 
-    // Mostrar el nombre del grupo sin guiones bajos y en mayúsculas
+    // Usar el nombre completo del grupo reemplazando guiones bajos por espacios
+    const base = grupoKey.split('_')[0]; // Para obtener el tipo base (proteinas, hidratos, etc.)
     const labelGrupo = grupoKey.replace(/_/g, ' ').toUpperCase();
 
     // Agregar icono al grupo
@@ -1296,7 +1301,6 @@ function renderOpcionesForm() {
       vegetales: "🥦",
       suplementos: "💊"
     };
-    const base = grupoKey.split('_')[0]; // Para agarrar 'proteinas' de 'proteinas_dm'
     const icono = iconos[base] || '';
 
     div.innerHTML = `<strong><span class="grupo-icono">${icono}</span> ${labelGrupo}</strong>`;
