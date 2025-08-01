@@ -358,26 +358,12 @@ const opciones = {
     "Bay Biscuit (2u)"
   ],
   frutas: [
-    "Banana",
-    "Manzana",
-    "Naranja",
-    "Pera",
-    "Frutilla",
-    "Mandarina",
-    "Durazno",
-    "Ciruela",
-    "Pomelo"
+    "SI",
+    "NO"
   ],
   frutas_no_entrenamiento: [
-    "Banana",
-    "Manzana",
-    "Naranja",
-    "Pera",
-    "Frutilla",
-    "Mandarina",
-    "Durazno",
-    "Ciruela",
-    "Pomelo"
+    "SI",
+    "NO"
   ],
   colaciones: [
     "Fruta",
