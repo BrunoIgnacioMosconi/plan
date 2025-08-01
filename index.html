@@ -53,13 +53,6 @@
     </section>
     <section id="tab-content-historial" class="tab-content" style="display:none">
       <h2>Historial de Comidas</h2>
-      <div class="export-import-container" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <button id="export-csv">📤 Exportar datos</button>
-        <div style="position: relative; overflow: hidden; display: inline-block;">
-          <button class="btn-secondary">📥 Importar CSV</button>
-          <input type="file" id="import-csv" accept=".csv" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-        </div>
-      </div>
       <ul id="historial-lista" class="historial-lista"></ul>
     </section>
 
@@ -97,6 +90,13 @@
       </div>
 
       <div style="background:#d4edda; padding:20px; border-radius:8px; box-shadow: var(--box-shadow);">
+      <div class="export-import-container" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <button id="export-csv">📤 Exportar datos</button>
+        <div style="position: relative; overflow: hidden; display: inline-block;">
+          <button class="btn-secondary">📥 Importar CSV</button>
+          <input type="file" id="import-csv" accept=".csv" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+        </div>
+      </div>
         <h3 style="margin-top:0">💡 Consejos de uso</h3>
         <ul style="padding-left: 20px;">
           <li>Utiliza <strong>Exportar datos</strong> regularmente para crear una copia de seguridad.</li>

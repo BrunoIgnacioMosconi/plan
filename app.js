@@ -1,3 +1,55 @@
+// Función para mostrar mensajes y permitir deshacer la última eliminación de alimento
+// Pila para guardar eliminaciones múltiples
+let gruposEliminadosStack = [];
+let eliminadosStack = [];
+function mostrarMensajeRestaurar(mensaje, grupoKey, valor, idx) {
+  let msgContainer = document.getElementById('mensaje-container');
+  if (!msgContainer) {
+    msgContainer = document.createElement('div');
+    msgContainer.id = 'mensaje-container';
+    msgContainer.className = 'mensaje-container';
+    document.body.appendChild(msgContainer);
+  }
+
+  // Guardar en la pila de eliminados
+  eliminadosStack.push({ grupoKey, valor, idx });
+
+  const msgElement = document.createElement('div');
+  msgElement.className = 'mensaje info';
+  msgElement.innerHTML = `<div class="mensaje-contenido"><span class="mensaje-icono">ℹ️</span> ${mensaje}</div>`;
+
+  // Botón de cerrar con restaurar
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.className = 'mensaje-cerrar';
+  closeBtn.onclick = () => {
+    // Restaurar el alimento eliminado (último de la pila)
+    const ultimo = eliminadosStack.pop();
+    if (ultimo) {
+      const current = getOpciones();
+      if (!Array.isArray(current[ultimo.grupoKey])) current[ultimo.grupoKey] = [];
+      current[ultimo.grupoKey].splice(ultimo.idx, 0, ultimo.valor);
+      setOpciones(current);
+      renderOpcionesForm();
+      cargarComidas();
+    }
+    msgContainer.removeChild(msgElement);
+  };
+  msgElement.querySelector('.mensaje-contenido').appendChild(closeBtn);
+
+  msgContainer.appendChild(msgElement);
+  setTimeout(() => msgElement.classList.add('visible'), 10);
+  setTimeout(() => {
+    if (msgElement.parentNode) {
+      msgElement.classList.remove('visible');
+      setTimeout(() => {
+        if (msgElement.parentNode) {
+          msgElement.parentNode.removeChild(msgElement);
+        }
+      }, 300);
+    }
+  }, 6000);
+}
 // — Exportar historial a CSV —
 function exportarHistorialCSV() {
    const historial = JSON.parse(localStorage.getItem('historialComidas') || '[]');
@@ -245,8 +297,6 @@ function importarHistorialCSV(file) {
     // independientemente de la pestaña actual
     renderOpcionesForm();
 
-    // Mostrar mensaje de éxito
-    mostrarMensaje('Historial, opciones y configuración de comidas importados correctamente', 'success');
   };
   reader.readAsText(file, 'UTF-8');
 }
@@ -963,58 +1013,6 @@ function setWaterCount(key, v) {
   localStorage.setItem('waterCounts', JSON.stringify(m));
 }
 
-// Función para mostrar mensajes al usuario
-function mostrarMensaje(mensaje, tipo = 'info') {
-  // Crear o recuperar el contenedor de mensajes
-  let msgContainer = document.getElementById('mensaje-container');
-  if (!msgContainer) {
-    msgContainer = document.createElement('div');
-    msgContainer.id = 'mensaje-container';
-    msgContainer.className = 'mensaje-container';
-    document.body.appendChild(msgContainer);
-  }
-
-  // Crear el mensaje
-  const msgElement = document.createElement('div');
-  msgElement.className = `mensaje ${tipo}`;
-
-  // Agregar icono según el tipo
-  let icono = '';
-  if (tipo === 'success') {
-    icono = '✅';
-  } else if (tipo === 'error') {
-    icono = '❌';
-  } else {
-    icono = 'ℹ️';
-  }
-
-  msgElement.innerHTML = `<div class="mensaje-contenido"><span class="mensaje-icono">${icono}</span> ${mensaje}</div>`;
-
-  // Agregar botón de cerrar
-  const closeBtn = document.createElement('button');
-  closeBtn.innerHTML = '&times;';
-  closeBtn.className = 'mensaje-cerrar';
-  closeBtn.onclick = () => msgContainer.removeChild(msgElement);
-  msgElement.querySelector('.mensaje-contenido').appendChild(closeBtn);
-
-  // Agregar al contenedor
-  msgContainer.appendChild(msgElement);
-
-  // Animación de entrada
-  setTimeout(() => msgElement.classList.add('visible'), 10);
-
-  // Auto-eliminar después de 4 segundos
-  setTimeout(() => {
-    if (msgElement.parentNode) {
-      msgElement.classList.remove('visible');
-      setTimeout(() => {
-        if (msgElement.parentNode) {
-          msgElement.parentNode.removeChild(msgElement);
-        }
-      }, 300); // Tiempo para la animación de salida
-    }
-  }, 4000);
-}
 
 // Función para modificar los grupos de comidas (añadir/quitar dropdowns)
 function modificarGruposComida(comidaNombre, tipoComida, grupo, accion) {
@@ -1131,6 +1129,56 @@ function renderOpcionesForm() {
       const grupoCount = document.createElement('span');
       grupoCount.textContent = `${comida.grupos.length} grupo(s)`;
       grupoCount.style.fontSize = '0.85rem';
+// Función para mostrar mensaje y restaurar grupo eliminado en Configurar Grupos por Comida
+function mostrarMensajeRestaurarGrupo(mensaje, comidaNombre, tipoDia, grupo, idx) {
+  let msgContainer = document.getElementById('mensaje-container');
+  if (!msgContainer) {
+    msgContainer = document.createElement('div');
+    msgContainer.id = 'mensaje-container';
+    msgContainer.className = 'mensaje-container';
+    document.body.appendChild(msgContainer);
+  }
+
+  const msgElement = document.createElement('div');
+  msgElement.className = 'mensaje info';
+  msgElement.innerHTML = `<div class=\"mensaje-contenido\"><span class=\"mensaje-icono\">ℹ️</span> ${mensaje}</div>`;
+
+  // Botón de cerrar con restaurar
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.className = 'mensaje-cerrar';
+  closeBtn.onclick = () => {
+    // Restaurar el grupo eliminado (último de la pila)
+    const ultimo = gruposEliminadosStack.pop();
+    if (ultimo) {
+      const lista = ultimo.tipoDia === 'entrenamiento' ? comidasEntrenamiento : comidasNoEntrenamiento;
+      const comida = lista.find(c => c.nombre === ultimo.comidaNombre);
+      if (comida) {
+        comida.grupos.splice(ultimo.idx, 0, ultimo.grupo);
+        // Guardar los cambios en localStorage
+        localStorage.setItem('comidasEntrenamiento', JSON.stringify(comidasEntrenamiento));
+        localStorage.setItem('comidasNoEntrenamiento', JSON.stringify(comidasNoEntrenamiento));
+        renderOpcionesForm();
+        mostrarConfigComidas(ultimo.tipoDia);
+      }
+    }
+    msgContainer.removeChild(msgElement);
+  };
+  msgElement.querySelector('.mensaje-contenido').appendChild(closeBtn);
+
+  msgContainer.appendChild(msgElement);
+  setTimeout(() => msgElement.classList.add('visible'), 10);
+  setTimeout(() => {
+    if (msgElement.parentNode) {
+      msgElement.classList.remove('visible');
+      setTimeout(() => {
+        if (msgElement.parentNode) {
+          msgElement.parentNode.removeChild(msgElement);
+        }
+      }, 300);
+    }
+  }, 6000);
+}
       grupoCount.style.color = '#757575';
 
       comidaHeader.appendChild(h4);
@@ -1142,7 +1190,7 @@ function renderOpcionesForm() {
         const gruposContainer = document.createElement('div');
         gruposContainer.style.marginBottom = '15px';
 
-        comida.grupos.forEach(grupo => {
+        comida.grupos.forEach((grupo, grupoIdx) => {
           const grupoItem = document.createElement('div');
           grupoItem.style.display = 'flex';
           grupoItem.style.alignItems = 'center';
@@ -1180,9 +1228,16 @@ function renderOpcionesForm() {
           btnQuitar.style.justifyContent = 'center';
           btnQuitar.style.alignItems = 'center';
           btnQuitar.onclick = () => {
+            // Guardar en la pila de eliminados de grupos
+            gruposEliminadosStack.push({
+              comidaNombre: comida.nombre,
+              tipoDia,
+              grupo,
+              idx: grupoIdx
+            });
             if (modificarGruposComida(comida.nombre, tipoDia, grupo, 'quitar')) {
-              mostrarMensaje(`Grupo ${grupo.toUpperCase()} eliminado de ${comida.nombre}`, 'success');
               mostrarConfigComidas(tipoDia);
+              mostrarMensajeRestaurarGrupo(`Grupo "${grupo.replace(/_/g, ' ').toUpperCase()}" eliminado de ${comida.nombre}. Haz clic en la X para restaurar.`, comida.nombre, tipoDia, grupo, grupoIdx);
             }
           };
 
@@ -1247,7 +1302,6 @@ function renderOpcionesForm() {
       btnAdd.onclick = () => {
         const grupoSeleccionado = select.value;
         if (modificarGruposComida(comida.nombre, tipoDia, grupoSeleccionado, 'agregar')) {
-          mostrarMensaje(`Grupo ${grupoSeleccionado.toUpperCase()} agregado a ${comida.nombre}`, 'success');
           mostrarConfigComidas(tipoDia);
         }
       };
@@ -1332,11 +1386,13 @@ function renderOpcionesForm() {
           btnDel.title = 'Eliminar este alimento';
 
           btnDel.onclick = () => {
+            // Guardar el eliminado en la pila para restaurar múltiples
+            const valorEliminado = current[grupoKey][idx];
             current[grupoKey].splice(idx, 1);
             setOpciones(current);
-            mostrarMensaje(`Opción "${opt}" eliminada de ${labelGrupo}`, 'info');
             renderOpcionesForm();
             cargarComidas();
+            mostrarMensajeRestaurar(`Opción "${valorEliminado}" eliminada de ${labelGrupo}. Haz clic en la X para restaurar.`, grupoKey, valorEliminado, idx);
           };
 
           li.appendChild(optionText);
@@ -1368,12 +1424,9 @@ function renderOpcionesForm() {
       if (val && !current[grupoKey].includes(val)) {
         current[grupoKey].push(val);
         setOpciones(current);
-        mostrarMensaje(`Opción "${val}" agregada a ${labelGrupo}`, 'success');
         renderOpcionesForm();
         cargarComidas();
         inp.value = '';
-      } else if (val && current[grupoKey].includes(val)) {
-        mostrarMensaje(`La opción "${val}" ya existe en ${labelGrupo}`, 'error');
       }
     };
 
