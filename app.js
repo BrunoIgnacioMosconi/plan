@@ -1261,14 +1261,20 @@ function mostrarMensajeRestaurarGrupo(mensaje, comidaNombre, tipoDia, grupo, idx
       addGroupDiv.style.display = 'flex';
       addGroupDiv.style.alignItems = 'center';
       addGroupDiv.style.marginTop = '10px';
+      addGroupDiv.style.flexWrap = 'wrap';
+      addGroupDiv.style.width = '100%';
+      addGroupDiv.style.boxSizing = 'border-box';
+      addGroupDiv.style.gap = '8px';
 
       const select = document.createElement('select');
       select.id = `select-add-grupo-${comida.nombre}-${tipoDia}`;
-      select.style.flex = '1';
+      select.style.flex = '1 1 200px';
+      select.style.minWidth = '0';
+      select.style.maxWidth = '100%';
       select.style.padding = '8px 12px';
       select.style.borderRadius = '4px';
       select.style.border = '1px solid #ddd';
-      select.style.marginRight = '10px';
+      select.style.boxSizing = 'border-box';
 
       // Opciones disponibles para añadir con iconos
       const opcionesGrupo = [
@@ -1299,6 +1305,12 @@ function mostrarMensajeRestaurarGrupo(mensaje, comidaNombre, tipoDia, grupo, idx
       const btnAdd = document.createElement('button');
       btnAdd.className = 'btn-outline';
       btnAdd.innerHTML = '➕ Agregar';
+      btnAdd.style.flex = '0 0 auto';
+      btnAdd.style.minWidth = '80px';
+      btnAdd.style.maxWidth = 'none';
+      btnAdd.style.boxSizing = 'border-box';
+      btnAdd.style.whiteSpace = 'nowrap';
+      btnAdd.style.padding = '8px 12px';
       btnAdd.onclick = () => {
         const grupoSeleccionado = select.value;
         if (modificarGruposComida(comida.nombre, tipoDia, grupoSeleccionado, 'agregar')) {
