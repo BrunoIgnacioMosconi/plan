@@ -32,21 +32,14 @@
       <div class="agua-container">
         <strong>💧 Agua del día:</strong>
         <div class="agua-contador">
-          <button id="add-water" class="btn-outline">+1 Vaso</button>
+          <button id="remove-water" class="btn-outline">-1</button>
+          <button id="add-water" class="btn-outline">+1</button>
           <span id="water-count">0</span>
           <button id="reset-water" class="btn-secondary">Reiniciar</button>
         </div>
       </div>
 
       <div id="suplementos-dia"></div>
-
-      <div class="tipo-dia-selector">
-        <label for="tipo-dia-select">📅 Tipo de día:</label>
-        <select id="tipo-dia-select">
-          <option value="entrenamiento">Día de entrenamiento</option>
-          <option value="no_entrenamiento">Día sin entrenamiento</option>
-        </select>
-      </div>
 
       <h2>Comidas del Día</h2>
       <ul id="comidas-lista" class="comidas-lista"></ul>
@@ -100,7 +93,6 @@
         <h3 style="margin-top:0">💡 Consejos de uso</h3>
         <ul style="padding-left: 20px;">
           <li>Utiliza <strong>Exportar datos</strong> regularmente para crear una copia de seguridad.</li>
-          <li>Cambia entre tipos de día según corresponda a tu rutina de ejercicios.</li>
           <li>Personaliza los alimentos en la sección de Configuración.</li>
           <li>Consulta el historial para analizar tus patrones alimenticios.</li>
         </ul>

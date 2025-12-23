@@ -302,49 +302,283 @@ button.btn-outline:hover {
 }
 
 .historial-fecha {
-  background-color: var(--primary-light);
-  padding: 12px 15px;
-  margin-bottom: 8px;
-  border-radius: 6px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  padding: 14px 18px;
+  margin-bottom: 0;
+  border-radius: 10px 10px 0 0;
   cursor: pointer;
   font-weight: 500;
-  color: var(--primary-dark);
-  box-shadow: var(--box-shadow);
+  color: white;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
 }
 
 .historial-fecha:hover {
-  background-color: var(--primary-color);
-  color: white;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  transform: translateY(-1px);
+}
+
+.historial-fecha .toggle-icon {
+  transition: transform 0.3s ease;
+  display: inline-block;
 }
 
 .historial-fecha + ul {
-  margin-left: 20px;
+  margin-left: 0;
   margin-bottom: 20px;
   background-color: white;
-  border-radius: 0 0 8px 8px;
-  box-shadow: var(--box-shadow);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  border-top: none;
 }
 
 .historial-fecha + ul li {
-  padding: 12px 15px;
-  border-bottom: 1px solid var(--divider-color);
+  padding: 0;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
 }
 
 .historial-fecha + ul li:last-child {
   border-bottom: none;
 }
 
+.historial-fecha + ul li:hover {
+  background-color: #fafafa;
+}
+
 .historial-item-nombre {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--primary-dark);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.historial-item-nombre::before {
+  content: '🍽️';
+  font-size: 1rem;
 }
 
 .historial-item-seleccion {
   display: block;
   color: var(--text-secondary);
-  margin-top: 5px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* Estilos para cada comida en el historial */
+.historial-comida-container {
+  padding: 18px 20px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.historial-comida-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--primary-light);
+}
+
+.historial-detalles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.historial-detalle-fila {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
+  transition: all 0.2s ease;
+}
+
+.historial-detalle-fila:hover {
+  background: linear-gradient(90deg, var(--primary-light) 0%, #ffffff 100%);
+  transform: translateX(3px);
+}
+
+.historial-grupo-label {
+  min-width: 200px;
+  font-weight: 500;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.historial-grupo-valor {
+  color: var(--text-primary);
+  font-weight: 400;
+  background: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Botón de editar en historial */
+.btn-editar-historial {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-editar-historial:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+/* Modo edición del historial */
+.historial-edit-form {
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+  border-radius: 12px;
+  border: 2px solid var(--primary-color);
+  animation: fadeInEdit 0.3s ease;
+}
+
+@keyframes fadeInEdit {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.historial-edit-form h4 {
+  margin: 0 0 15px 0;
+  color: var(--primary-dark);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.historial-edit-form h4::before {
+  content: '✏️';
+}
+
+.historial-edit-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+}
+
+.historial-edit-grupo:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
+}
+
+.historial-edit-grupo label {
+  font-weight: 500;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.95rem;
+}
+
+.historial-edit-grupo select {
+  padding: 10px 14px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.historial-edit-grupo select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.historial-edit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-guardar-edit {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-guardar-edit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.btn-cancelar-edit {
+  background: #f5f5f5;
+  color: var(--text-primary);
+  border: 1px solid #ddd;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancelar-edit:hover {
+  background: #e0e0e0;
+}
+
+/* Badges del historial */
+.historial-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.historial-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.historial-badge-agua {
+  background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+  color: #1565C0;
+}
+
+.historial-badge-suplementos {
+  background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
+  color: #7B1FA2;
 }
 
 /* Configuración de opciones */
@@ -363,12 +597,66 @@ button.btn-outline:hover {
 }
 
 .grupo-opciones strong {
-  display: block;
-  margin-bottom: 10px;
+  display: inline;
   color: var(--primary-dark);
   font-size: 1.1rem;
+}
+
+.grupo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 2px solid var(--primary-light);
   padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.grupo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.grupo-toggle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: transform 0.2s;
+}
+
+.grupo-contador {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: normal;
+}
+
+.btn-ordenar {
+  background: var(--background-light);
+  border: 1px solid var(--divider-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background 0.2s;
+}
+
+.btn-ordenar:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.grupo-contenido {
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+  overflow: hidden;
+}
+
+.grupo-contenido.collapsed {
+  max-height: 0 !important;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .grupo-opciones ul {
@@ -412,9 +700,10 @@ button.btn-outline:hover {
   padding: 10px;
   text-align: center;
   background-color: var(--background-light);
+  color: var(--text-primary);
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .config-tab:first-child {
@@ -474,6 +763,27 @@ button.btn-outline:hover {
   color: white;
 }
 
+.mensaje.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mensaje-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mensaje-cerrar {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 5px;
+  margin-left: 10px;
+}
+
 /* Footer */
 footer {
   margin-top: 2rem;
@@ -520,6 +830,49 @@ footer {
   .opciones-form {
     grid-template-columns: 1fr;
   }
+
+  /* Historial responsive */
+  .historial-grupo-label {
+    min-width: 140px;
+    font-size: 0.85rem;
+  }
+
+  .historial-detalle-fila {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .historial-grupo-valor {
+    width: 100%;
+    text-align: left;
+  }
+
+  .historial-comida-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .btn-editar-historial {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .historial-edit-buttons {
+    flex-direction: column;
+  }
+
+  .btn-guardar-edit,
+  .btn-cancelar-edit {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .historial-badges {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -562,4 +915,18 @@ footer {
 button.btn-completar,
 .comidas-lista button.btn-secondary {
   margin-right: 0;
+}
+
+/* Icono clickeable en grupos */
+.grupo-icono {
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.grupo-icono:hover {
+  transform: scale(1.2);
+}
+
+/* Popup selector de iconos */
+.icono-selector-popup button:hover {
+  transform: scale(1.15);
 }
