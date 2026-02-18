@@ -258,52 +258,52 @@ let tabActual = 'principal';
 const opciones = {
   // === PROTEÍNAS ===
   proteinas_desayuno_merienda: [
-    "Queso (2u)",
-    "Fetas de jamon (2u)",
-    "Huevo entero (2u)",
-    "Ricota (50g)",
+    "Queso (3u)",
+    "Fetas de jamon (3u)",
+    "Huevo entero (3u)",
+    "Ricota (80g)",
   ],
   proteinas_almuerzo: [
-    "Lomo (250g)",
-    "Solomillo (250g)",
-    "Peceto (250g)",
-    "Bola de Lomo(250g)",
-    "Cuadril (250g)",
-    "Nalga(250g)",
-    "Pollo (250g)",
-    "Pavo (250g)"
+    "Lomo (280g)",
+    "Solomillo (280g)",
+    "Peceto (280g)",
+    "Bola de Lomo(280g)",
+    "Cuadril (280g)",
+    "Nalga(280g)",
+    "Pollo (280g)",
+    "Pavo (280g)"
   ],
   proteinas_cena: [
-    "Solomillo (200g)",
-    "Pollo (200g)",
-    "Pavo (200g)",
-    "Abadejo (200g)",
-    "atún (200g)",
-    "merluza (200g)",
-    "salmón (200g)",
-    "trucha (200g)",
+    "Solomillo (220g)",
+    "Pollo (220g)",
+    "Pavo (220g)",
+    "Abadejo (220g)",
+    "atún (220g)",
+    "merluza (220g)",
+    "salmón (220g)",
+    "trucha (220g)",
   ],
 
   // === HIDRATOS ===
   hidratos_desayuno_merienda: [
-    "Pan lactal integral (2u)",
-    "Granola (50gr)",
-    "Avena (50gr)",
+    "Pan lactal integral (3u)",
+    "Granola (80gr)",
+    "Avena (80gr)",
   ],
   hidratos_almuerzo: [
-    "Legumbre (180gr)",
-    "Arroz (180gr cocido)",
+    "Legumbre (310-340gr)",
+    "Arroz (310-340gr cocido)",
   ],
   hidratos_cena: [
-    "Papa (150gr)",
-    "Camote (150gr)",
-    "Legumbres (150gr)",
+    "Papa (240-280gr)",
+    "Camote (240-280gr)",
+    "Legumbres (240-280gr)",
   ],
 
   // === LÁCTEOS ===
   lacteos_desayuno_merienda: [
-    "Leche (150cc)",
-    "Yogur (150cc)",
+    "Leche (200cc)",
+    "Yogur (200cc)",
   ],
 
   // === FRUTAS ===
